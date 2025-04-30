@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Test'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -52,15 +52,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_BF83C231D7CF466D8AF5699367EB5985 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F8511856C04140CCA035C40F2D2D9D62 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EC5D8EBF8F0942D8B17E8D3A9FEBFC7B }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6A95159FCB2E4FCCB0539D8384599153 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3DF0D8FA46F74BCA9A53E6A4F7210AD6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4B78D0A5F0294ED99808AE6840C106D9 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Opalo-Class-Test'
-          slot-name: 'Test'
+          slot-name: 'Production'
           package: '*.jar'
           
