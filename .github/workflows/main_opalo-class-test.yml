@@ -35,9 +35,9 @@ jobs:
           name: java-app
       - uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6A95159FCB2E4FCCB0539D8384599153 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3DF0D8FA46F74BCA9A53E6A4F7210AD6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4B78D0A5F0294ED99808AE6840C106D9 }}
       - uses: azure/webapps-deploy@v3
         with:
           app-name: 'Opalo-Class-Test'
