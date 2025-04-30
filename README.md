@@ -26,16 +26,6 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
                               │ fechaHora              │
                               │ confirmada             │
                               └────────────────────────┘
-
-┌────────────────────┐        ┌────────────────────────┐
-│   notificaciones   │        │        reportes        │
-├────────────────────┤        ├────────────────────────┤
-│ _id                │        │ _id                    │
-│ usuarioId          │        │ tipo                   │
-│ tipo               │        │ parametros             │
-│ mensaje            │        │ contenido              │
-│ fechaEnvio         │        │ fechaGeneracion        │
-└────────────────────┘        └────────────────────────┘
 ```
 
 ---
@@ -162,27 +152,18 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 │ NotificacionRepository     │
 │ ReporteRepository          │
 └────────────────────────────┘
-
-       ▼
-
-┌────────────────────────────┐
-│    Tareas programadas      │
-├────────────────────────────┤
-│ Recordatorios automáticos  │
-│ Confirmaciones post-sesión │
-│ Generación de reportes     │
-└────────────────────────────┘
 ```
 
 ---
 ![Architecture](assets/1.png)
 
 
-## 🛠️ Tecnologías sugeridas
+## 🛠️ Tecnologías Sugeridas
 
-- Java + Spring Boot
-- MongoDB (NoSQL)
-- Spring Data MongoDB
-- JWT para autenticación
-- Scheduler de Spring para tareas automáticas
-- Apache PDFBox o JasperReports para reportes
+- **Java 17** (LTS)
+- **Spring Boot 3.x**
+- **Maven (Mvn)** como sistema de construcción
+- **MongoDB** (NoSQL)
+- **Spring Data MongoDB** para integración con Mongo
+- **JWT (JSON Web Token)** para autenticación segura
+- **Lombok** (opcional para reducir código repetitivo en modelos)
