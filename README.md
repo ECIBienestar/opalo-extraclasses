@@ -4,6 +4,11 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 
 ---
 
+## 👥 Autores
+- David Santiago Espinosa Rojas
+- Emily Noreña Cardozo
+- Mayerlly Suarez Correa
+
 ## 🧩 Modelo de Datos (MongoDB)
 
 ```plaintext
