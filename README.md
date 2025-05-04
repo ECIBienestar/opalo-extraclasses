@@ -48,7 +48,29 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 ## 📄 Ejemplos de Documentos en MongoDB
 
 
+
 ---
+### Steps to Run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ECIBienestar/opalo-extraclasses
+   cd opalo-extraclasses
+   ```
+
+2. Configure database connection in `application.properties`:
+   ```properties
+   spring.data.mongodb.uri=
+   spring.data.mongodb.database=
+   ```
+
+3. Build and run the application:
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+---
+=======
 
 ### `clasesExtracurriculares`
 
