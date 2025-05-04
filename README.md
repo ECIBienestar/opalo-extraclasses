@@ -1,91 +1,14 @@
-# ECI-Bienestar - Extracurricular Class Attendance Service
+# 🎓 Microservicio: Asistencia a Clases Extracurriculares
 
-This microservice is part of the ECIBienestar platform at Escuela Colombiana de Ingeniería Julio Garavito. It manages user attendance for extracurricular classes, allowing registration, consultation, reporting, and notification features for all community members.
+Este microservicio gestiona el registro, consulta y seguimiento de la asistencia a clases extracurriculares de una universidad, como parte del módulo de Bienestar Universitario.
 
-## 👥 Authors
-
-- **Emily Noreña Cardozo**  
-  GitHub: [EmilyNorena](https://github.com/EmilyNorena)
-
-- **David Santiago Espinoza Rojas**  
-  GitHub: [daviespr1406](https://github.com/daviespr1406)
-
-- **Mayerlly Suárez Correa**  
-  GitHub: [mayerllyyo](https://github.com/mayerllyyo)
-
-## 📌 Project Overview
-
-The Extracurricular Class Attendance Service is responsible for tracking and managing attendance records of users participating in extracurricular classes. This includes both manual and bulk registration, detailed attendance reports, automated notifications, and integration with other services within the ECIBienestar ecosystem.
-
-## 🛠️ Technologies Used
-
-- **Java 17**
-- **Spring Boot 3.x** (Spring Security, Spring Web)
-- **MongoDB** (NoSQL Database)
-- **Maven**
-- **Lombok**
-- **JUnit 5 & Mockito** (for testing)
-- **JaCoCo** (for code coverage)
-- **SonarCloud** (for code quality)
-- **JWT** (for secure authentication)
-
-## 📂 Project Structure
-
-```
-bismuto-statistics-service/
-├── pom.xml
-├── .gitignore
-├── README.md
-├── assets/
-└── src/
-    ├── main/
-    │   ├── java/
-    │   │   └── com/example/edu/eci/
-    │   │       ├── Application.java
-    │   │       ├── controller/
-    │   │       ├── exception/
-    │   │       ├── model/
-    │   │       ├── service/
-    │   │       └── repository/
-    │   └── resources/
-    └── test/
-        └── java/
-            └── com/example/edu/eci/
-                ├── Application.java
-                ├── controller/       # Controller Tests
-                ├── exception/        # Exception Tests
-                ├── model/            # Model Tests
-                ├── service/          # Service Tests
-                └── repository/       # Utility Tests
-```
-
-## 🚀 How to Run the Project
-
-### Prerequisites
-- Install **Java 17**
-- Install **Maven**
-- Set up a **MongoDB** database
-
-### Steps to Run
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ECIBienestar/opalo-extraclasses
-   cd opalo-extraclasses
-   ```
-
-2. Configure database connection in `application.properties`:
-   ```properties
-   spring.data.mongodb.uri=
-   spring.data.mongodb.database=
-   ```
-
-3. Build and run the application:
-   ```bash
-   mvn clean install
-   mvn spring-boot:run
-   ```
 ---
+
+## 👥 Autores
+- David Santiago Espinosa Rojas
+- Emily Noreña Cardozo
+- Mayerlly Suarez Correa
+
 ## 🧩 Modelo de Datos (MongoDB)
 
 ```plaintext
@@ -108,6 +31,16 @@ bismuto-statistics-service/
                               │ fechaHora              │
                               │ confirmada             │
                               └────────────────────────┘
+
+┌────────────────────┐        ┌────────────────────────┐
+│   notificaciones   │        │        reportes        │
+├────────────────────┤        ├────────────────────────┤
+│ _id                │        │ _id                    │
+│ usuarioId          │        │ tipo                   │
+│ tipo               │        │ parametros             │
+│ mensaje            │        │ contenido              │
+│ fechaEnvio         │        │ fechaGeneracion        │
+└────────────────────┘        └────────────────────────┘
 ```
 
 ---
@@ -115,7 +48,29 @@ bismuto-statistics-service/
 ## 📄 Ejemplos de Documentos en MongoDB
 
 
+
 ---
+### Steps to Run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ECIBienestar/opalo-extraclasses
+   cd opalo-extraclasses
+   ```
+
+2. Configure database connection in `application.properties`:
+   ```properties
+   spring.data.mongodb.uri=
+   spring.data.mongodb.database=
+   ```
+
+3. Build and run the application:
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+---
+=======
 
 ### `clasesExtracurriculares`
 
@@ -234,8 +189,27 @@ bismuto-statistics-service/
 │ NotificacionRepository     │
 │ ReporteRepository          │
 └────────────────────────────┘
+
+       ▼
+
+┌────────────────────────────┐
+│    Tareas programadas      │
+├────────────────────────────┤
+│ Recordatorios automáticos  │
+│ Confirmaciones post-sesión │
+│ Generación de reportes     │
+└────────────────────────────┘
 ```
 
 ---
 ![Architecture](assets/1.png)
 
+
+## 🛠️ Tecnologías sugeridas
+
+- Java + Spring Boot
+- MongoDB (NoSQL)
+- Spring Data MongoDB
+- JWT para autenticación
+- Scheduler de Spring para tareas automáticas
+- Apache PDFBox o JasperReports para reportes
