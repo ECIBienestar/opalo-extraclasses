@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +34,7 @@ class AssistanceServiceTest {
         Assistance assistance = new Assistance();
         assistance.setUserId(userId);
         assistance.setClassId(classId);
-        assistance.setConfirm(false); // No confirmada aún
+        assistance.setConfirm(false);
 
         when(assistanceRepository.findByUserIdAndClassId(userId, classId))
                 .thenReturn(Optional.of(assistance));
@@ -65,5 +66,36 @@ class AssistanceServiceTest {
 
         assertThrows(IllegalStateException.class, () ->
                 assistanceService.confirmAssistance("user1", "class1"));
+    }
+    @Test
+    void getAssistancesWithTrueReturnsEmptyListWhenNoConfirmedAssistances() {
+        when(assistanceRepository.findByConfirmTrue()).thenReturn(List.of());
+
+        List<Assistance> result = assistanceService.getAssistancesWithTrue();
+
+        assertTrue(result.isEmpty());
+        verify(assistanceRepository).findByConfirmTrue();
+    }
+
+    @Test
+    void getAssistancesWithTrueReturnsListOfConfirmedAssistances() {
+        Assistance assistance1 = new Assistance();
+        assistance1.setUserId("user1");
+        assistance1.setClassId("class1");
+        assistance1.setConfirm(true);
+
+        Assistance assistance2 = new Assistance();
+        assistance2.setUserId("user2");
+        assistance2.setClassId("class2");
+        assistance2.setConfirm(true);
+
+        when(assistanceRepository.findByConfirmTrue()).thenReturn(List.of(assistance1, assistance2));
+
+        List<Assistance> result = assistanceService.getAssistancesWithTrue();
+
+        assertEquals(2, result.size());
+        assertTrue(result.get(0).isConfirm());
+        assertTrue(result.get(1).isConfirm());
+        verify(assistanceRepository).findByConfirmTrue();
     }
 }

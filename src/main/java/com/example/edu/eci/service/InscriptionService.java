@@ -9,7 +9,11 @@ import com.example.edu.eci.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+
+import static java.time.LocalTime.now;
 
 @Service
 public class InscriptionService {
@@ -50,7 +54,19 @@ public class InscriptionService {
         assistance.setUserId(userId);
         assistance.setClassId(classId);
         assistance.setConfirm(false);
+        assistance.setStartTime(clase.getStartTime());
+
 
         assistanceRepository.save(assistance);
+    }
+
+    public List<Assistance> getAssistancesWithFalse() {
+        return assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(LocalDateTime.now().with(now()));
+    }
+    public void deleteInscription(String userId, String classId) {
+        if (!assistanceRepository.existsByUserIdAndClassId(userId, classId)) {
+            throw new IllegalArgumentException("La inscripción no existe.");
+        }
+        assistanceRepository.deleteByUserIdAndClassId(userId, classId);
     }
 }

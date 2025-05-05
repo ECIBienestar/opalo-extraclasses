@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 @NoArgsConstructor
 @Getter
@@ -17,8 +18,9 @@ public class Class{
     private String id;
     private String name;
     private int MaxStudents;
-    private LocalDate StartTime;
-    private LocalDate EndTime;
+    private LocalDateTime StartTime;
+    private LocalDateTime EndTime;
+    private String repetition;
     private List<Equipment> resources;
     @Getter
     @Setter

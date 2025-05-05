@@ -10,8 +10,12 @@ import com.example.edu.eci.service.InscriptionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import static java.time.LocalTime.now;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -93,5 +97,61 @@ class InscriptionServiceTest {
         assertThrows(IllegalStateException.class, () ->
                 inscriptionService.inscribeUser("user1", "class1"));
     }
+    @Test
+    void getAssistancesWithFalseAndPastStartTimeReturnsEmptyListWhenNoMatchingAssistances() {
+        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of());
+
+        List<Assistance> result = inscriptionService.getAssistancesWithFalse();
+
+        assertTrue(result.isEmpty());
+        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
+    }
+
+    @Test
+    void getAssistancesWithFalseAndPastStartTimeReturnsListOfMatchingAssistances() {
+        Assistance assistance1 = new Assistance();
+        assistance1.setUserId("user1");
+        assistance1.setClassId("class1");
+        assistance1.setConfirm(false);
+        assistance1.setStartTime(LocalDateTime.now().minusDays(1));
+
+        Assistance assistance2 = new Assistance();
+        assistance2.setUserId("user2");
+        assistance2.setClassId("class2");
+        assistance2.setConfirm(false);
+        assistance2.setStartTime(LocalDateTime.now().minusHours(2));
+
+        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of(assistance1, assistance2));
+
+        List<Assistance> result = inscriptionService.getAssistancesWithFalse();
+
+        assertEquals(2, result.size());
+        assertFalse(result.get(0).isConfirm());
+        assertFalse(result.get(1).isConfirm());
+        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
+    }
+    @Test
+    void testDeleteInscriptionSuccessfully() {
+        String userId = "user1";
+        String classId = "class1";
+
+        when(assistanceRepository.existsByUserIdAndClassId(userId, classId)).thenReturn(true);
+
+        assertDoesNotThrow(() -> inscriptionService.deleteInscription(userId, classId));
+
+        verify(assistanceRepository).deleteByUserIdAndClassId(userId, classId);
+    }
+
+    @Test
+    void testDeleteInscriptionFailsWhenNotFound() {
+        String userId = "user1";
+        String classId = "class1";
+
+        when(assistanceRepository.existsByUserIdAndClassId(userId, classId)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                inscriptionService.deleteInscription(userId, classId));
+    }
+
 }
 
