@@ -4,10 +4,17 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 
 ---
 
-## 👥 Autores
-- David Santiago Espinosa Rojas
-- Emily Noreña Cardozo
-- Mayerlly Suarez Correa
+
+## 👥 Authors
+
+- *Emily Noreña Cardozo*  
+  GitHub: [EmilyNorena](https://github.com/EmilyNorena)
+
+- *David Santiago Espinoza Rojas*  
+  GitHub: [daviespr1406](https://github.com/daviespr1406)
+
+- *Mayerlly Suárez Correa*  
+  GitHub: [mayerllyyo](https://github.com/mayerllyyo)
 
 ## 🧩 Modelo de Datos (MongoDB)
 
@@ -17,7 +24,7 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 ├────────────────────┤        ├────────────────────────┤
 │ _id                │        │ _id                    │
 │ nombreCompleto     │        │ nombre                 │
-│ tipoUsuario        │        │ tipoActividad          │
+│ tipoUsuario        │        │ tipoActividad          │ 
 │ identificacion     │        │ capacidadMaxima        │
 │ email              │        │ fechaInicio/fechaFin   │
 └────────────────────┘        │ recursos[]             │
@@ -31,24 +38,9 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
                               │ fechaHora              │
                               │ confirmada             │
                               └────────────────────────┘
-
-┌────────────────────┐        ┌────────────────────────┐
-│   notificaciones   │        │        reportes        │
-├────────────────────┤        ├────────────────────────┤
-│ _id                │        │ _id                    │
-│ usuarioId          │        │ tipo                   │
-│ tipo               │        │ parametros             │
-│ mensaje            │        │ contenido              │
-│ fechaEnvio         │        │ fechaGeneracion        │
-└────────────────────┘        └────────────────────────┘
 ```
 
 ---
-
-## 📄 Ejemplos de Documentos en MongoDB
-
-
-
 ---
 ### Steps to Run
 
@@ -70,6 +62,19 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
    mvn spring-boot:run
    ```
 ---
+## 🛠️ Technologies Used
+
+- *Java 17*
+- *Spring Boot 3.x* (Spring Security, Spring Web)
+- *MongoDB* (NoSQL Database)
+- *Maven*
+- *Lombok*
+- *JUnit 5 & Mockito* (for testing)
+- *JaCoCo* (for code coverage)
+- *SonarCloud* (for code quality)
+- *JWT* (for secure authentication)
+
+## 📄 Ejemplos de Documentos en MongoDB
 =======
 
 ### `clasesExtracurriculares`
