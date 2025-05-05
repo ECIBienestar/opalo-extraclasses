@@ -15,7 +15,7 @@ public class User {
     @Id
     private String id;
     private String name;
-    private String type; // Ejemplo: "estudiante", "docente"
+    private String type;
     private String identification;
     private String email;
 

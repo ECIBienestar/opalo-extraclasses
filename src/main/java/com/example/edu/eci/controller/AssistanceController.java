@@ -1,5 +1,6 @@
 package com.example.edu.eci.controller;
 
+import com.example.edu.eci.model.Assistance;
 import com.example.edu.eci.service.AssistanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
+
 @Tag(name = "Asistencia", description = "API para gestionar asistencias a clases")
 
 @RestController
@@ -16,6 +20,18 @@ public class AssistanceController {
 
     @Autowired
     private AssistanceService assistanceService;
+    @GetMapping
+    @Operation(
+            summary = "asistencias confirmadas",
+            description = "Obtiene todas las asistencias confirmadas"
+    )
+    public ResponseEntity<List<Assistance>> getAllReserves() {
+        List<Assistance> asistances = assistanceService.getAssistancesWithTrue();
+        if (asistances.isEmpty() ) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(asistances);
+    }
 
     @PostMapping("/{userId}/class/{classId}/confirm")
     @Operation(

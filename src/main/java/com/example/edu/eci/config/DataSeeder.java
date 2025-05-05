@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -31,7 +32,7 @@ if (classRepo.count() == 0) {
 Class clase = new Class();
 clase.setId("abc123");
 clase.setName("Taller de pintura");
-clase.setStartTime(LocalDate.of(2023, 10, 1));
+clase.setStartTime(LocalDateTime.of(2023, 10, 1, 10, 0));
 clase.setMaxStudents(10);
 clase.setResources(List.of(new Class.Equipment("Pinceles",4), new Class.Equipment("Lienzos",6)));
 classRepo.save(clase);
