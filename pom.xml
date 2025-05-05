@@ -146,7 +146,8 @@
 								<rule>
 									<element>CLASS</element>
 									<excludes>
-										<exclude>com/example/edu/eci/Application.class</exclude>
+										<exclude>com/example/edu/eci/Application</exclude>
+										<exclude>com/example/edu/eci/config/*</exclude>
 									</excludes>
 								</rule>
 								<rule>
@@ -164,6 +165,7 @@
 								<exclude>**/controller/*</exclude>
 								<exclude>**/model/*</exclude>
 								<exclude>**/dto/*</exclude>
+								<exclude>com/example/edu/eci/config/*</exclude>
 								<exclude>**/config/*</exclude>
 								<exclude>**/Application.class</exclude>
 							</excludes>
