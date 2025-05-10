@@ -1,4 +1,5 @@
 package com.example.edu.eci.controller;
+
 import com.example.edu.eci.model.Class;
 import com.example.edu.eci.service.ClassService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,12 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
 @Tag(name = "Clase", description = "API para gestionar clases")
 @RestController
 @RequestMapping("/api/classes")
 public class ClassController {
+
     @Autowired
     private ClassService classService;
+
     @GetMapping
     @Operation(
             summary = "Obtener todas las clases",
@@ -28,13 +32,13 @@ public class ClassController {
         }
         return ResponseEntity.ok(classes);
     }
+
     @GetMapping("/class")
     @Operation(
             summary = "Obtener clase por ID",
             description = "Obtiene los detalles de una clase específica por su ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Clase encontrada"),
-                    //content = @Content(schema = @Schema(implementation = Class.class))),
                     @ApiResponse(responseCode = "404", description = "Clase no encontrada")
             }
     )
@@ -45,6 +49,7 @@ public class ClassController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
     @PostMapping
     @Operation(
             summary = "Crear una nueva clase",
@@ -58,6 +63,7 @@ public class ClassController {
         Class createdClass = classService.createClass(newClass);
         return ResponseEntity.status(201).body(createdClass);
     }
+
     @PutMapping("/update")
     @Operation(
             summary = "Actualizar una clase",
@@ -76,6 +82,7 @@ public class ClassController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
     @DeleteMapping("/delete")
     @Operation(
             summary = "Eliminar una clase",
