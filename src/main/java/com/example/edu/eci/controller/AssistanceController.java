@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "Asistencia", description = "API para gestionar asistencias a clases")
@@ -33,22 +34,43 @@ public class AssistanceController {
         return ResponseEntity.ok(asistances);
     }
 
-    @PostMapping("/{userId}/class/{classId}/confirm")
+    @PostMapping("/confirm")
     @Operation(
             summary = "Confirmar asistencia",
             description = "Confirma la asistencia de un usuario a una clase específica",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Asistencia confirmada"),
-                    @ApiResponse(responseCode = "400", description = "Error en la solicitud")
+                    @ApiResponse(responseCode = "400", description = "Error en la solicitud"),
+                    @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
             }
     )
-    public ResponseEntity<String> confirmAssistance(@Parameter(description = "ID del usuario", required = true, example = "123") @PathVariable String userId,
-                                                    @Parameter(description = "ID de la clase", required = true, example = "456") @PathVariable String classId) {
+    public ResponseEntity<String> confirmAssistance(
+            @Parameter(description = "ID del usuario", required = true, example = "123")
+            @RequestParam String userId,
+
+            @Parameter(description = "ID de la clase", required = true, example = "abc123")
+            @RequestParam String classId) {
+
         try {
             assistanceService.confirmAssistance(userId, classId);
             return ResponseEntity.ok("Asistencia confirmada exitosamente");
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    /*public ResponseEntity<String> classesAttended(
+            @Parameter(description = "Fecha inicio periodo de tiempo", required = true, example = "YYYY-MM-DD")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+
+            @Parameter(description = "Fecha fin periodo de tiempo", required = true, example = "abc123")
+            @RequestParam String endDate) {
+
+        try {
+            assistanceService.classesAttended(startDate, endDate);
+            return ResponseEntity.ok("Asistencia confirmada exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }*/
 }
