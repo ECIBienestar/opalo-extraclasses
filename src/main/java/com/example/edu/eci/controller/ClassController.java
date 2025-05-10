@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +63,7 @@ public class ClassController {
                     @ApiResponse(responseCode = "400", description = "Error en la solicitud")
             }
     )
-    public ResponseEntity<Class> createClass(@RequestBody Class newClass) {
+    public ResponseEntity<Class> createClass(@Valid @RequestBody Class newClass) {
         Class createdClass = classService.createClass(newClass);
         return ResponseEntity.status(201).body(createdClass);
     }
@@ -80,7 +82,7 @@ public class ClassController {
             @RequestParam String id,
 
             @Parameter(description = "Datos actualizados de la clase", required = true)
-            @RequestBody Class updatedClass) {
+            @Valid @RequestBody Class updatedClass) {
 
         return classService.updateClass(id, updatedClass)
                 .map(ResponseEntity::ok)
