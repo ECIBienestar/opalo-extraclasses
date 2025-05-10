@@ -35,7 +35,7 @@ public class InscriptionController {
         return ResponseEntity.ok(asistances);
     }
 
-    @PostMapping("/{userId}/class/{classId}")
+    @PostMapping("/inscribe")
     @Operation(
             summary = "inscribir usuario a clase",
             description = "Inscribir un usuario a una clase específica",
@@ -44,8 +44,13 @@ public class InscriptionController {
                     @ApiResponse(responseCode = "400", description = "Error en la solicitud")
             }
     )
-    public ResponseEntity<String> inscribeUser(@Parameter(description = "ID del usuario", required = true, example = "123") @PathVariable String userId,
-                                               @Parameter(description = "ID de la clase", required = true, example = "456") @PathVariable String classId) {
+    public ResponseEntity<String> inscribeUser(
+            @Parameter(description = "ID del usuario", required = true, example = "123")
+            @RequestParam String userId,
+
+            @Parameter(description = "ID de la clase", required = true, example = "abc123")
+            @RequestParam String classId) {
+
         try {
             inscriptionService.inscribeUser(userId, classId);
             return ResponseEntity.ok("Usuario inscrito exitosamente");
@@ -54,23 +59,28 @@ public class InscriptionController {
         }
     }
 
-    @DeleteMapping("/{userId}/class/{classId}/delete")
+    @DeleteMapping("/delete")
     @Operation(
             summary = "eliminar inscripcion de usuario a clase",
             description = "Elimina la inscripción de un usuario a una clase específica",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Inscripción eliminada exitosamente"),
-                    @ApiResponse(responseCode = "400", description = "Error en la solicitud")
+                    @ApiResponse(responseCode = "400", description = "Error en la solicitud"),
+                    @ApiResponse(responseCode = "404", description = "Inscripción no encontrada")
             }
     )
-    public ResponseEntity<String> deleteInscription(@Parameter(description = "ID del usuario", required = true, example = "123") @PathVariable String userId,
-                                                    @Parameter(description = "ID de la clase", required = true, example = "456") @PathVariable String classId) {
+    public ResponseEntity<String> deleteInscription(
+            @Parameter(description = "ID del usuario", required = true, example = "123")
+            @RequestParam String userId,
+
+            @Parameter(description = "ID de la clase", required = true, example = "abc123")
+            @RequestParam String classId) {
+
         try {
             inscriptionService.deleteInscription(userId, classId);
             return ResponseEntity.ok("Inscripción eliminada exitosamente");
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-
         }
     }
 }

@@ -56,6 +56,7 @@ public class InscriptionService {
         assistance.setConfirm(false);
         assistance.setStartTime(clase.getStartTime());
 
+        //clase.setMaxStudents(clase.getMaxStudents() - 1);
 
         assistanceRepository.save(assistance);
     }
