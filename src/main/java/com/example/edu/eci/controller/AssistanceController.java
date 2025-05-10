@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "Asistencia", description = "API para gestionar asistencias a clases")
@@ -57,4 +58,19 @@ public class AssistanceController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    /*public ResponseEntity<String> classesAttended(
+            @Parameter(description = "Fecha inicio periodo de tiempo", required = true, example = "YYYY-MM-DD")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+
+            @Parameter(description = "Fecha fin periodo de tiempo", required = true, example = "abc123")
+            @RequestParam String endDate) {
+
+        try {
+            assistanceService.classesAttended(startDate, endDate);
+            return ResponseEntity.ok("Asistencia confirmada exitosamente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }*/
 }
