@@ -5,6 +5,7 @@ import com.example.edu.eci.repository.AssistanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -12,7 +13,6 @@ public class AssistanceService {
 
     @Autowired
     private AssistanceRepository assistanceRepository;
-
     public void confirmAssistance(String usuarioId, String claseId) {
         Optional<Assistance> asistenciaOpt = assistanceRepository
                 .findByUserIdAndClassId(usuarioId, claseId);
@@ -29,5 +29,8 @@ public class AssistanceService {
 
         assistance.setConfirm(true);
         assistanceRepository.save(assistance);
+    }
+    public List<Assistance> getAssistancesWithTrue() {
+        return assistanceRepository.findByConfirmTrue();
     }
 }
