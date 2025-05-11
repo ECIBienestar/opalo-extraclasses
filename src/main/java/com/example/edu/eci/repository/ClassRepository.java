@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface ClassRepository extends MongoRepository<Class, String> {
     List<Class> findByStartTimeBetween(LocalDateTime startTime, LocalDateTime startTime2);
+    List<Class> findClassByType(String type);
 }
 

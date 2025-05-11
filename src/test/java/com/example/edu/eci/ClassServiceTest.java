@@ -75,14 +75,16 @@ class ClassServiceTest {
     }
 
     @Test
-    void createClass() {
+    void createClass_shouldReturnListWithSingleClass_whenNoRepetition() {
         when(classRepository.save(testClass1)).thenReturn(testClass1);
 
-        Class result = classService.createClass(testClass1);
-
-        assertEquals(testClass1, result);
+        List<Class> result = classService.createClass(testClass1);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(testClass1, result.get(0));
         verify(classRepository, times(1)).save(testClass1);
     }
+
 
     @Test
     void updateClass_Success() {
@@ -134,4 +136,69 @@ class ClassServiceTest {
         assertEquals(1, result.size());
         verify(classRepository, times(1)).findByStartTimeBetween(start, end);
     }
+
+    @Test
+    void generateRepeatedClasses_weekly_repetition_should_create_correct_number() {
+        Class baseClass = new Class();
+        baseClass.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+        baseClass.setEndTime(LocalDateTime.of(2024, 1, 1, 11, 0));
+        baseClass.setRepetition("weekly");
+        baseClass.setEndTimeRepetition(LocalDateTime.of(2024, 1, 22, 10, 0));
+        baseClass.setInstructorId("instructor123");
+
+        List<Class> repeated = classService.generateRepeatedClasses(baseClass);
+
+        assertEquals(3, repeated.size()); // 3 repeticiones: 8, 15, 22 de enero
+        assertEquals(LocalDateTime.of(2024, 1, 8, 10, 0), repeated.get(0).getStartTime());
+        assertEquals("instructor123", repeated.get(0).getInstructorId());
+    }
+
+    @Test
+    void generateRepeatedClasses_should_return_empty_when_repetition_end_is_before_next_occurrence() {
+        Class baseClass = new Class();
+        baseClass.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+        baseClass.setEndTime(LocalDateTime.of(2024, 1, 1, 11, 0));
+        baseClass.setRepetition("weekly");
+        baseClass.setEndTimeRepetition(LocalDateTime.of(2024, 1, 2, 10, 0)); // no alcanza para repetir
+
+        List<Class> repeated = classService.generateRepeatedClasses(baseClass);
+
+        assertTrue(repeated.isEmpty(), "No se deberían generar clases repetidas");
+    }
+
+
+    @Test
+    void testGetClassesByType_returnsMatchingClasses() {
+        String type = "Deportiva";
+        Class class1 = new Class();
+        class1.setId("1");
+        class1.setType(type);
+
+        Class class2 = new Class();
+        class2.setId("2");
+        class2.setType(type);
+
+        when(classRepository.findClassByType(type)).thenReturn(List.of(class1, class2));
+
+        List<Class> result = classService.getClassesByType(type);
+
+        assertEquals(2, result.size());
+        assertEquals(type, result.get(0).getType());
+        verify(classRepository).findClassByType(type);
+    }
+
+    @Test
+    void generateRepeatedClasses_invalid_repetition_type_should_throw_exception() {
+        Class baseClass = new Class();
+        baseClass.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+        baseClass.setEndTime(LocalDateTime.of(2024, 1, 1, 11, 0));
+        baseClass.setRepetition("daily");
+        baseClass.setEndTimeRepetition(LocalDateTime.of(2024, 1, 10, 10, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            classService.generateRepeatedClasses(baseClass);
+        });
+    }
+
+
 }

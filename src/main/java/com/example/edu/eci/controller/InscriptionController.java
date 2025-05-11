@@ -28,7 +28,7 @@ public class InscriptionController {
             description = "Obtiene todas las inscripciones realizadas"
     )
     public ResponseEntity<List<Assistance>> getAllReserves() {
-        List<Assistance> asistances = inscriptionService.getAssistancesWithFalse();
+        List<Assistance> asistances = inscriptionService.getAssistancesWithFalseAfter();
         if (asistances.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

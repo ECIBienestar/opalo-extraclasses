@@ -59,10 +59,11 @@ public class ClassController {
                     @ApiResponse(responseCode = "400", description = "Error en la solicitud")
             }
     )
-    public ResponseEntity<Class> createClass(@Valid @RequestBody Class newClass) {
-        Class createdClass = classService.createClass(newClass);
-        return ResponseEntity.status(201).body(createdClass);
+    public ResponseEntity<List<Class>> createClass(@Valid @RequestBody Class newClass) {
+        List<Class> createdClasses = classService.createClass(newClass);
+        return ResponseEntity.status(201).body(createdClasses);
     }
+
 
     @PutMapping("/update")
     @Operation(
@@ -100,4 +101,25 @@ public class ClassController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/type")
+    @Operation(
+            summary = "Obtener clases por tipo",
+            description = "Obtiene una lista de clases según el tipo de actividad",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Clases encontradas"),
+                    @ApiResponse(responseCode = "404", description = "No se encontraron clases del tipo especificado")
+            }
+    )
+    public ResponseEntity<List<Class>> getClassesByType(
+            @Parameter(description = "Tipo de la clase/actividad", required = true, example = "Deportiva, Cultural, Artística, etc.")
+            @RequestParam String classType) {
+
+        List<Class> classes = classService.getClassesByType(classType);
+        if (classes.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(classes);
+    }
+
 }
