@@ -98,17 +98,17 @@ class InscriptionServiceTest {
                 inscriptionService.inscribeUser("user1", "class1"));
     }
     @Test
-    void getAssistancesWithFalseAndPastStartTimeReturnsEmptyListWhenNoMatchingAssistances() {
+    void getAssistancesWithFalseAndPastStartTimeReturnsEmptyListWhenNoMatchingAssistancesAfter() {
         when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of());
 
-        List<Assistance> result = inscriptionService.getAssistancesWithFalse();
+        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
 
         assertTrue(result.isEmpty());
         verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
     }
 
     @Test
-    void getAssistancesWithFalseAndPastStartTimeReturnsListOfMatchingAssistances() {
+    void getAssistancesWithFalseAndPastStartTimeReturnsListOfMatchingAssistancesAfter() {
         Assistance assistance1 = new Assistance();
         assistance1.setUserId("user1");
         assistance1.setClassId("class1");
@@ -123,7 +123,7 @@ class InscriptionServiceTest {
 
         when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of(assistance1, assistance2));
 
-        List<Assistance> result = inscriptionService.getAssistancesWithFalse();
+        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
 
         assertEquals(2, result.size());
         assertFalse(result.get(0).isConfirm());

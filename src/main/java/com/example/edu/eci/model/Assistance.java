@@ -19,6 +19,7 @@ public class Assistance {
     private String id;
     private LocalDateTime startTime;
     private String userId;
+    private String instructorId;
     private String classId;
     private boolean confirm;
 
