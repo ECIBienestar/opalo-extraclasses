@@ -61,9 +61,10 @@ public class InscriptionService {
         assistanceRepository.save(assistance);
     }
 
-    public List<Assistance> getAssistancesWithFalse() {
+    public List<Assistance> getAssistancesWithFalseAfter() {
         return assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(LocalDateTime.now().with(now()));
     }
+
     public void deleteInscription(String userId, String classId) {
         if (!assistanceRepository.existsByUserIdAndClassId(userId, classId)) {
             throw new IllegalArgumentException("La inscripción no existe.");
