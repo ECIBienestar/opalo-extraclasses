@@ -87,6 +87,7 @@ public class ClassService {
             repeated.setStartTime(currentStart);
             repeated.setEndTime(currentEnd);
             repeated.setInstructorId(baseClass.getInstructorId());
+            repeated.setMaxStudents(baseClass.getMaxStudents());
             repeated.setRepetition(null);
             repeated.setEndTimeRepetition(null);
 
