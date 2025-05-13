@@ -18,10 +18,13 @@ public class Class{
     private String id;
     private String name;
     private int MaxStudents;
+    private String type;
     private LocalDateTime StartTime;
     private LocalDateTime EndTime;
     private String repetition;
+    private LocalDateTime EndTimeRepetition;
     private List<Equipment> resources;
+    private String instructorId;
     @Getter
     @Setter
     @AllArgsConstructor
