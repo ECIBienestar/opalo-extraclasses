@@ -1,9 +1,8 @@
-# 🎓 Microservicio: Asistencia a Clases Extracurriculares
+# 🎓 Microservice: Extracurricular Class Attendance
 
-Este microservicio gestiona el registro, consulta y seguimiento de la asistencia a clases extracurriculares de una universidad, como parte del módulo de Bienestar Universitario.
+This microservice manages the registration, consultation, and monitoring of attendance to extracurricular classes at a university, as part of the University Wellness module.
 
 ---
-
 
 ## 👥 Authors
 
@@ -16,11 +15,13 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 - *Mayerlly Suárez Correa*  
   GitHub: [mayerllyyo](https://github.com/mayerllyyo)
 
-## 🧩 Modelo de Datos (MongoDB)
+---
+
+## 🧩 Data Model (MongoDB)
 
 ```plaintext
 ┌────────────────────┐        ┌────────────────────────┐
-│     usuarios       │        │  clasesExtracurriculares│
+│     usuarios       │        │ extracurricularClasses │
 ├────────────────────┤        ├────────────────────────┤
 │ _id                │        │ _id                    │
 │ nombreCompleto     │        │ nombre                 │
@@ -41,8 +42,8 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 ```
 
 ---
----
-### Steps to Run
+
+## ▶️ Steps to Run
 
 1. Clone the repository:
    ```bash
@@ -61,7 +62,9 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
    mvn clean install
    mvn spring-boot:run
    ```
+
 ---
+
 ## 🛠️ Technologies Used
 
 - *Java 17*
@@ -74,8 +77,9 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 - *SonarCloud* (for code quality)
 - *JWT* (for secure authentication)
 
-## 📄 Ejemplos de Documentos en MongoDB
-=======
+---
+
+## 📄 MongoDB Document Examples
 
 ### `clasesExtracurriculares`
 
@@ -107,8 +111,6 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 }
 ```
 
----
-
 ### `asistencias`
 
 ```json
@@ -120,8 +122,6 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
   "confirmada": true
 }
 ```
-
----
 
 ### `notificaciones`
 
@@ -135,8 +135,6 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
   "enviado": true
 }
 ```
-
----
 
 ### `reportes`
 
@@ -158,11 +156,11 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
 
 ---
 
-## ⚙️ Componentes del Microservicio
+## ⚙️ Microservice Components
 
 ```plaintext
 ┌────────────────────────────┐
-│       API REST             │
+│       REST API             │
 ├────────────────────────────┤
 │ POST   /asistencias        │
 │ GET    /asistencias/user   │
@@ -174,7 +172,7 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
        ▼
 
 ┌────────────────────────────┐
-│       Servicios            │
+│         Services           │
 ├────────────────────────────┤
 │ AsistenciaService          │
 │ ClaseService               │
@@ -186,7 +184,7 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
        ▼
 
 ┌────────────────────────────┐
-│     Repositorios (Mongo)   │
+│      Mongo Repositories    │
 ├────────────────────────────┤
 │ UsuarioRepository          │
 │ ClaseRepository            │
@@ -198,23 +196,92 @@ Este microservicio gestiona el registro, consulta y seguimiento de la asistencia
        ▼
 
 ┌────────────────────────────┐
-│    Tareas programadas      │
+│    Scheduled Tasks         │
 ├────────────────────────────┤
-│ Recordatorios automáticos  │
-│ Confirmaciones post-sesión │
-│ Generación de reportes     │
+│ Automatic reminders        │
+│ Post-session confirmations │
+│ Report generation          │
 └────────────────────────────┘
 ```
 
----
 ![Architecture](assets/1.png)
 
+---
+### 📦 Integration with Other Modules
 
-## 🛠️ Tecnologías sugeridas
+- Connect with central user service for authentication and user info
+- Consume scheduling microservice for conflict validation
+- Generate events for notification microservice
 
-- Java + Spring Boot
-- MongoDB (NoSQL)
-- Spring Data MongoDB
-- JWT para autenticación
-- Scheduler de Spring para tareas automáticas
-- Apache PDFBox o JasperReports para reportes
+### 🏗️ Architecture Document
+
+- [x] Explain layered structure
+- [x] Show flow from controller to repository
+- [x] Indicate external service interactions
+
+### 📝 Requirements Analysis
+
+- [ ] Functional requirements
+- [ ] Non-functional requirements (performance, scalability, security)
+
+### 📚 Class Diagram
+
+![Class Diagram](assets/2.png)
+
+### 🔁 Sequence Diagram
+
+![Sequence Diagram](assets/sequence-diagram.png) 
+
+### 📘 Swagger Documentation
+
+- [Swagger on Azure](https://opalo-class-aae2hqc0fee9f7am.canadacentral-01.azurewebsites.net/swagger-ui/index.html)
+
+### 😊 Happy Path
+
+- [x] User enrolls in class
+- [ ] Receives notification
+- [x] Attends session
+- [x] Attendance is confirmed
+
+### ⚠️ Error Handling
+
+- [x] Duplicate enrollment
+- [x] Class full
+- [x] Database errors
+- [ ] Unauthorized access
+
+### 🧪 Test Evidence
+
+- [x] Unit test results
+- [x] Integration test logs
+- [x] JaCoCo coverage report
+### JaCoCo Coverage Report
+![CI/CD](assets/5.png)
+
+
+### 🔄 CI/CD and Deployment Evidence
+
+- [x] GitHub Actions workflows
+- [ ] SonarCloud analysis link
+- [x] Azure deployment logs/screenshots
+
+### CI/CD Test Pipeline
+![CI/CD](assets/4.png)
+### CI/CD Production Pipeline
+![CI/CD](assets/3.png)
+
+
+### 📁 Project Structure
+
+```plaintext
+src/
+├── config/
+├── controllers/
+├── dto/
+├── exceptions/
+├── models/
+├── repositories/
+├── security/
+├── services/
+└── utils/
+```
