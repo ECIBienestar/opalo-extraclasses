@@ -9,7 +9,7 @@ This microservice manages the registration, consultation, and monitoring of atte
 - *Emily Noreña Cardozo*  
   GitHub: [EmilyNorena](https://github.com/EmilyNorena)
 
-- *David Santiago Espinoza Rojas*  
+- *David Santiago Espinosa Rojas*  
   GitHub: [daviespr1406](https://github.com/daviespr1406)
 
 - *Mayerlly Suárez Correa*  
@@ -230,7 +230,7 @@ This microservice manages the registration, consultation, and monitoring of atte
 
 ### 🔁 Sequence Diagram
 
-![Sequence Diagram](assets/sequence-diagram.png) 
+![Sequence Diagram](assets/6.png) 
 
 ### 📘 Swagger Documentation
 
