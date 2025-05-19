@@ -15,7 +15,8 @@ public interface AssistanceRepository extends MongoRepository<Assistance, String
     List<Assistance> findByConfirmFalseAndStartTimeIsAfter(LocalDateTime now);
     List<Assistance> findByConfirmTrue();
     void deleteByUserIdAndClassId(String userId, String classId);
-    int countByUserIdAndConfirmTrueAndStartTimeBetween(String userId, LocalDate start, LocalDate end);
+    int countByUserIdAndConfirmTrueAndStartTimeBetween(String userId, LocalDateTime startTime, LocalDateTime startTime2);
     int countByUserIdAndClassIdAndConfirmTrue(String userId, String classId);
     List<Assistance> findByConfirmFalseAndStartTimeIsBefore(LocalDateTime now);
+    List<Assistance> findByConfirmFalseAndClassIdIn(List<String> classIds);
 }

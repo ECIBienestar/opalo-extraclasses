@@ -104,37 +104,6 @@ class AssistanceServiceTest {
     }
 
     @Test
-    void testCountConfirmedAttendances_success() {
-        String userId = "user1";
-        LocalDate start = LocalDate.of(2025, 5, 1);
-        LocalDate end = LocalDate.of(2025, 6, 1);
-        int expectedCount = 1;
-
-        when(assistanceRepository.countByUserIdAndConfirmTrueAndStartTimeBetween(userId, start, end))
-                .thenReturn(expectedCount);
-
-        long result = assistanceService.countConfirmedAttendances(userId, start, end);
-        assertEquals(expectedCount, result);
-        verify(assistanceRepository).countByUserIdAndConfirmTrueAndStartTimeBetween(userId, start, end);
-    }
-
-    @Test
-    void testCountConfirmedAttendances_throwsExceptionWhenNoAttendances() {
-        String userId = "user2";
-        LocalDate start = LocalDate.of(2024, 07, 1);
-        LocalDate end = LocalDate.of(2024, 07, 31);
-
-        when(assistanceRepository.countByUserIdAndConfirmTrueAndStartTimeBetween(userId, start, end))
-                .thenReturn(0);
-
-        Exception exception = assertThrows(IllegalStateException.class, () ->
-                assistanceService.countConfirmedAttendances(userId, start, end));
-
-        assertEquals("No hay asistencias registradas para este usuario", exception.getMessage());
-        verify(assistanceRepository).countByUserIdAndConfirmTrueAndStartTimeBetween(userId, start, end);
-    }
-
-    @Test
     void testCountAttendancesByClass_success() {
         String userId = "user1";
         String classId = "classA";
@@ -188,6 +157,80 @@ class AssistanceServiceTest {
         assertFalse(result.get(0).isConfirm());
         assertFalse(result.get(1).isConfirm());
         verify(assistanceRepository).findByConfirmFalseAndStartTimeIsBefore(any(LocalDateTime.class));
+    }
+    @Test
+    void confirmAssistance_shouldThrowException_whenUserNotEnrolledInClass() {
+        when(assistanceRepository.findByUserIdAndClassId("user1", "class1"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () ->
+                assistanceService.confirmAssistance("user1", "class1", "instructor1"));
+    }
+
+    @Test
+    void confirmAssistance_shouldThrowException_whenAssistanceAlreadyConfirmed() {
+        Assistance assistance = new Assistance();
+        assistance.setUserId("user1");
+        assistance.setClassId("class1");
+        assistance.setConfirm(true);
+
+        when(assistanceRepository.findByUserIdAndClassId("user1", "class1"))
+                .thenReturn(Optional.of(assistance));
+
+        assertThrows(IllegalStateException.class, () ->
+                assistanceService.confirmAssistance("user1", "class1", "instructor1"));
+    }
+
+    @Test
+    void confirmAssistance_shouldConfirmAssistanceSuccessfully() {
+        Assistance assistance = new Assistance();
+        assistance.setUserId("user1");
+        assistance.setClassId("class1");
+        assistance.setConfirm(false);
+
+        when(assistanceRepository.findByUserIdAndClassId("user1", "class1"))
+                .thenReturn(Optional.of(assistance));
+
+        assistanceService.confirmAssistance("user1", "class1", "instructor1");
+
+        assertTrue(assistance.isConfirm());
+        assertEquals("instructor1", assistance.getInstructorId());
+        verify(assistanceRepository).save(assistance);
+    }
+
+    @Test
+    void countConfirmedAttendances_shouldReturnCount_whenAttendancesExist() {
+        String userId = "user1";
+        LocalDate start = LocalDate.of(2024, 7, 1);
+        LocalDate end = LocalDate.of(2024, 7, 31);
+
+        when(assistanceRepository.countByUserIdAndConfirmTrueAndStartTimeBetween(
+                userId, start.atStartOfDay(), end.atTime(LocalTime.MAX)))
+                .thenReturn(5);
+
+        long result = assistanceService.countConfirmedAttendances(userId, start, end);
+
+        assertEquals(5L, result);
+        verify(assistanceRepository).countByUserIdAndConfirmTrueAndStartTimeBetween(
+                userId, start.atStartOfDay(), end.atTime(LocalTime.MAX));
+    }
+
+    @Test
+    void countConfirmedAttendances_shouldThrowException_whenNoAttendancesExist() {
+        String userId = "user2";
+        LocalDate start = LocalDate.of(2024, 7, 1);
+        LocalDate end = LocalDate.of(2024, 7, 31);
+
+        when(assistanceRepository.countByUserIdAndConfirmTrueAndStartTimeBetween(
+                userId, start.atStartOfDay(), end.atTime(LocalTime.MAX)))
+                .thenReturn(0);
+
+        Exception exception = assertThrows(IllegalStateException.class, () ->
+                assistanceService.countConfirmedAttendances(userId, start, end));
+
+        assertEquals("No hay asistencias registradas para este usuario", exception.getMessage());
+        verify(assistanceRepository).countByUserIdAndConfirmTrueAndStartTimeBetween(
+                userId, start.atStartOfDay(), end.atTime(LocalTime.MAX));
     }
 
 

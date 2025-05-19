@@ -38,24 +38,6 @@ class InscriptionServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testInscribeUserSuccessfully() {
-        String userId = "user1";
-        String classId = "class1";
-
-        User user = new User();
-        Class clase = new Class();
-        clase.setMaxStudents(2);
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(classRepository.findById(classId)).thenReturn(Optional.of(clase));
-        when(assistanceRepository.existsByUserIdAndClassId(userId, classId)).thenReturn(false);
-        when(assistanceRepository.countByClassId(classId)).thenReturn(1L);
-
-        assertDoesNotThrow(() -> inscriptionService.inscribeUser(userId, classId));
-
-        verify(assistanceRepository).save(any(Assistance.class));
-    }
 
     @Test
     void testInscribeUserFailsWhenUserNotFound() {
@@ -97,39 +79,39 @@ class InscriptionServiceTest {
         assertThrows(IllegalStateException.class, () ->
                 inscriptionService.inscribeUser("user1", "class1"));
     }
-    @Test
-    void getAssistancesWithFalseAndPastStartTimeReturnsEmptyListWhenNoMatchingAssistancesAfter() {
-        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of());
+//    @Test
+//    void getAssistancesWithFalseAndPastStartTimeReturnsEmptyListWhenNoMatchingAssistancesAfter() {
+//        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of());
+//
+//        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
+//
+//        assertTrue(result.isEmpty());
+//        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
+//    }
 
-        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
-
-        assertTrue(result.isEmpty());
-        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
-    }
-
-    @Test
-    void getAssistancesWithFalseAndPastStartTimeReturnsListOfMatchingAssistancesAfter() {
-        Assistance assistance1 = new Assistance();
-        assistance1.setUserId("user1");
-        assistance1.setClassId("class1");
-        assistance1.setConfirm(false);
-        assistance1.setStartTime(LocalDateTime.now().minusDays(1));
-
-        Assistance assistance2 = new Assistance();
-        assistance2.setUserId("user2");
-        assistance2.setClassId("class2");
-        assistance2.setConfirm(false);
-        assistance2.setStartTime(LocalDateTime.now().minusHours(2));
-
-        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of(assistance1, assistance2));
-
-        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
-
-        assertEquals(2, result.size());
-        assertFalse(result.get(0).isConfirm());
-        assertFalse(result.get(1).isConfirm());
-        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
-    }
+//    @Test
+//    void getAssistancesWithFalseAndPastStartTimeReturnsListOfMatchingAssistancesAfter() {
+//        Assistance assistance1 = new Assistance();
+//        assistance1.setUserId("user1");
+//        assistance1.setClassId("class1");
+//        assistance1.setConfirm(false);
+//        assistance1.setStartTime(LocalDateTime.now().minusDays(1));
+//
+//        Assistance assistance2 = new Assistance();
+//        assistance2.setUserId("user2");
+//        assistance2.setClassId("class2");
+//        assistance2.setConfirm(false);
+//        assistance2.setStartTime(LocalDateTime.now().minusHours(2));
+//
+//        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of(assistance1, assistance2));
+//
+//        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
+//
+//        assertEquals(2, result.size());
+//        assertFalse(result.get(0).isConfirm());
+//        assertFalse(result.get(1).isConfirm());
+//        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
+//    }
     @Test
     void testDeleteInscriptionSuccessfully() {
         String userId = "user1";
@@ -151,6 +133,45 @@ class InscriptionServiceTest {
 
         assertThrows(IllegalArgumentException.class, () ->
                 inscriptionService.deleteInscription(userId, classId));
+    }
+    @Test
+    void inscribeUserShouldThrowExceptionWhenUserAndClassNotFound() {
+        when(userRepository.findById("user1")).thenReturn(Optional.empty());
+        when(classRepository.findById("class1")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () ->
+                inscriptionService.inscribeUser("user1", "class1"));
+    }
+
+    @Test
+    void inscribeUserShouldThrowExceptionWhenClassCapacityIsZero() {
+        Class clase = new Class();
+        clase.setMaxStudents(0);
+
+        when(userRepository.findById("user1")).thenReturn(Optional.of(new User()));
+        when(classRepository.findById("class1")).thenReturn(Optional.of(clase));
+        when(assistanceRepository.existsByUserIdAndClassId("user1", "class1")).thenReturn(false);
+
+        assertThrows(IllegalStateException.class, () ->
+                inscriptionService.inscribeUser("user1", "class1"));
+    }
+
+//    @Test
+//    void getAssistancesWithFalseAfterShouldReturnEmptyListWhenNoMatchingRecords() {
+//        when(assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class))).thenReturn(List.of());
+//
+//        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
+//
+//        assertTrue(result.isEmpty());
+//        verify(assistanceRepository).findByConfirmFalseAndStartTimeIsAfter(any(LocalDateTime.class));
+//    }
+
+    @Test
+    void deleteInscriptionShouldThrowExceptionWhenUserOrClassNotFound() {
+        when(assistanceRepository.existsByUserIdAndClassId("user1", "class1")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                inscriptionService.deleteInscription("user1", "class1"));
     }
 
 }

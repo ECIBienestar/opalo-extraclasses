@@ -21,6 +21,7 @@ public class Assistance {
     private String userId;
     private String instructorId;
     private String classId;
+    private String SessionId;
     private boolean confirm;
 
 }

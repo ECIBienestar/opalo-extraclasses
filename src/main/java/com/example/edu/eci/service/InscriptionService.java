@@ -9,9 +9,11 @@ import com.example.edu.eci.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.time.LocalTime.now;
 
@@ -37,33 +39,43 @@ public class InscriptionService {
 
         Class clase = claseOpt.get();
 
-        // Verificar si ya está inscrito
-        boolean Inscribed = assistanceRepository.existsByUserIdAndClassId(userId, classId);
-        if (Inscribed) {
+        boolean inscribed = assistanceRepository.existsByUserIdAndClassId(userId, classId);
+        if (inscribed) {
             throw new IllegalStateException("Usuario ya inscrito en la clase");
         }
 
-        // Verificar capacidad
-        long inscribed = assistanceRepository.countByClassId(classId);
-        if (inscribed >= clase.getMaxStudents()) {
+        long inscribedCount = assistanceRepository.countByClassId(classId);
+        if (inscribedCount >= clase.getMaxStudents()) {
             throw new IllegalStateException("Capacidad máxima alcanzada");
         }
 
-        // Crear registro de assistance pendiente
-        Assistance assistance = new Assistance();
-        assistance.setUserId(userId);
-        assistance.setClassId(classId);
-        assistance.setConfirm(false);
-        assistance.setStartTime(clase.getStartTime());
+        Assistance classAssistance = new Assistance();
+        classAssistance.setUserId(userId);
+        classAssistance.setClassId(classId);
+        classAssistance.setConfirm(false);
+        assistanceRepository.save(classAssistance);
 
-        //clase.setMaxStudents(clase.getMaxStudents() - 1);
-
-        assistanceRepository.save(assistance);
+        clase.getSessions().forEach(session -> {
+            Assistance sessionAssistance = new Assistance();
+            sessionAssistance.setUserId(userId);
+            sessionAssistance.setClassId(classId);
+            sessionAssistance.setSessionId(session.getId());
+            sessionAssistance.setConfirm(false);
+            assistanceRepository.save(sessionAssistance);
+        });
     }
 
     public List<Assistance> getAssistancesWithFalseAfter() {
-        return assistanceRepository.findByConfirmFalseAndStartTimeIsAfter(LocalDateTime.now().with(now()));
+        LocalDate today = LocalDate.now();
+
+        List<String> activeClassIds = classRepository.findByEndDateAfterOrEndDateEquals(today,today)
+                .stream()
+                .map(Class::getId)
+                .collect(Collectors.toList());
+
+        return assistanceRepository.findByConfirmFalseAndClassIdIn(activeClassIds);
     }
+
 
     public void deleteInscription(String userId, String classId) {
         if (!assistanceRepository.existsByUserIdAndClassId(userId, classId)) {
