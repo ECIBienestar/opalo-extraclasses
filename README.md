@@ -126,6 +126,7 @@ This microservice manages the registration, consultation, and monitoring of atte
   }
 }
 ```
+```
 
 ### `asistencias`
 
