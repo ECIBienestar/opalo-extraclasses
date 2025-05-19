@@ -15,8 +15,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.LocalTime.now;
-
 @Service
 public class AssistanceService {
 
@@ -29,17 +27,17 @@ public class AssistanceService {
     @Autowired
     private UserRepository userRepository;
 
-    public void confirmAssistance(String userId, String classId, String instructorId) {
-        Optional<Assistance> assistanceOpt = assistanceRepository.findByUserIdAndClassId(userId, classId);
+    public void confirmAssistance(String userId, String classId, String sessionId, String instructorId) {
+        Optional<Assistance> assistanceOpt = assistanceRepository.findByUserIdAndClassIdAndSessionId(userId, classId, sessionId);
 
         if (assistanceOpt.isEmpty()) {
-            throw new IllegalArgumentException("No existe inscripción para confirmar asistencia");
+            throw new IllegalArgumentException("No existe inscripción para esta sesión");
         }
 
         Assistance assistance = assistanceOpt.get();
 
         if (assistance.isConfirm()) {
-            throw new IllegalStateException("Asistencia ya confirmada");
+            throw new IllegalStateException("Asistencia ya confirmada para esta sesión");
         }
 
         assistance.setConfirm(true);
@@ -82,9 +80,9 @@ public class AssistanceService {
 
         Class clase = classOpt.get();
 
-        boolean isInscribed = assistanceRepository.existsByUserIdAndClassId(userId, classId);
-        if (isInscribed) {
-            throw new IllegalStateException("Usuario ya inscrito en la clase");
+        boolean alreadyInscribed = assistanceRepository.existsByUserIdAndClassId(userId, classId);
+        if (alreadyInscribed) {
+            throw new IllegalStateException("Usuario ya inscrito en esta clase");
         }
 
         long inscribedCount = assistanceRepository.countByClassId(classId);
@@ -92,12 +90,14 @@ public class AssistanceService {
             throw new IllegalStateException("Capacidad máxima alcanzada");
         }
 
-        Assistance assistance = new Assistance();
-        assistance.setUserId(userId);
-        assistance.setClassId(classId);
-        assistance.setStartTime(LocalDateTime.now());
-        assistance.setConfirm(false);
-
-        assistanceRepository.save(assistance);
+        for (Class.Session session : clase.getSessions()) {
+            Assistance assistance = new Assistance();
+            assistance.setUserId(userId);
+            assistance.setClassId(classId);
+            assistance.setSessionId(session.getId());
+            assistance.setStartTime(LocalDateTime.now());
+            assistance.setConfirm(false);
+            assistanceRepository.save(assistance);
+        }
     }
 }

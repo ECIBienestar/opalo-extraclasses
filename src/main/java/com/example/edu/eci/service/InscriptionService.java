@@ -65,6 +65,7 @@ public class InscriptionService {
         });
     }
 
+
     public List<Assistance> getAssistancesWithFalseAfter() {
         LocalDate today = LocalDate.now();
 
