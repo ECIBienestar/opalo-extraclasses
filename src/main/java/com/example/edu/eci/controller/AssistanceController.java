@@ -2,17 +2,16 @@ package com.example.edu.eci.controller;
 
 import com.example.edu.eci.model.Assistance;
 import com.example.edu.eci.service.AssistanceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Asistencia", description = "API para gestionar asistencias a clases")
@@ -23,23 +22,21 @@ public class AssistanceController {
 
     @Autowired
     private AssistanceService assistanceService;
-    @GetMapping("/attendances")
+
+    @GetMapping("/confirmed")
     @Operation(
-            summary = "asistencias confirmadas",
+            summary = "Asistencias confirmadas",
             description = "Obtiene todas las asistencias confirmadas"
     )
-    public ResponseEntity<List<Assistance>> getAllReserves() {
-        List<Assistance> asistances = assistanceService.getAssistancesWithTrue();
-        if (asistances.isEmpty() ) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(asistances);
+    public ResponseEntity<List<Assistance>> getAllConfirmed() {
+        List<Assistance> assistances = assistanceService.getAssistancesWithTrue();
+        return assistances.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assistances);
     }
 
     @PostMapping("/confirm")
     @Operation(
-            summary = "Confirmar asistencia",
-            description = "Confirma la asistencia de un usuario a una clase específica",
+            summary = "Confirmar asistencia a una sesión",
+            description = "Confirma la asistencia de un usuario a una sesión específica de una clase",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Asistencia confirmada"),
                     @ApiResponse(responseCode = "400", description = "Error en la solicitud"),
@@ -47,32 +44,27 @@ public class AssistanceController {
             }
     )
     public ResponseEntity<String> confirmAssistance(
-            @Parameter(description = "ID del usuario", required = true, example = "123")
-            @RequestParam String userId,
-            @Parameter(description = "ID del instructor que registra la asistencia", required = true, example = "123")
-            @RequestParam String instructorId,
-            @Parameter(description = "ID de la clase", required = true, example = "abc123")
-            @RequestParam String classId) {
-
+            @Parameter(description = "ID del usuario", required = true) @RequestParam String userId,
+            @Parameter(description = "ID del instructor", required = true) @RequestParam String instructorId,
+            @Parameter(description = "ID de la clase", required = true) @RequestParam String classId,
+            @Parameter(description = "ID de la sesión", required = true) @RequestParam String sessionId
+    ) {
         try {
-            assistanceService.confirmAssistance(userId, classId, instructorId);
+            assistanceService.confirmAssistance(userId, classId, sessionId, instructorId);
             return ResponseEntity.ok("Asistencia confirmada exitosamente");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/user/confirmed")
     @Operation(
-            summary = "Obtener asistencias en un periodo de tiempo",
-            description = "Obtiene la cantidad de clases a las que ha asistido un usuario en un periodo de tiempo dado"
+            summary = "Cantidad de asistencias confirmadas en un periodo",
+            description = "Obtiene el número de asistencias confirmadas por un usuario en un periodo de tiempo"
     )
     public ResponseEntity<?> numberClassesAttended(
-            @Parameter(description = "ID del usuario", required = true, example = "123")
             @RequestParam String userId,
-            @Parameter(description = "Fecha inicio periodo", required = true, example = "YYYY-MM-DD")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @Parameter(description = "Fecha fin periodo", required = true, example = "YYYY-MM-DD")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
     ) {
         try {
@@ -85,13 +77,11 @@ public class AssistanceController {
 
     @GetMapping("/user/class")
     @Operation(
-            summary = "Obtener asistencias dada una clase",
-            description = "Obtiene la cantidad de clases a las que ha asistido un usuario dada una clase"
+            summary = "Cantidad de asistencias confirmadas por clase",
+            description = "Obtiene el número de asistencias confirmadas de un usuario en una clase específica"
     )
     public ResponseEntity<?> numberClassesAttendedByClass(
-            @Parameter(description = "ID del usuario", required = true, example = "123")
             @RequestParam String userId,
-            @Parameter(description = "ID de la clase", required = true, example = "abc123")
             @RequestParam String classId
     ) {
         try {
@@ -104,14 +94,12 @@ public class AssistanceController {
 
     @GetMapping("/absences")
     @Operation(
-            summary = "inasistencias",
-            description = "Obtiene todas las inasistencias"
+            summary = "Obtener inasistencias",
+            description = "Obtiene todas las asistencias no confirmadas en sesiones pasadas"
     )
     public ResponseEntity<List<Assistance>> getAllAbsences() {
-        List<Assistance> asistances = assistanceService.getAssistancesWithFalseBefore();
-        if (asistances.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(asistances);
+        List<Assistance> assistances = assistanceService.getAssistancesWithFalseBefore();
+        return assistances.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assistances);
     }
 }
+

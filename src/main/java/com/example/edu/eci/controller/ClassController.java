@@ -51,18 +51,18 @@ public class ClassController {
     }
 
     @PostMapping
-    @Operation(
-            summary = "Crear una nueva clase",
-            description = "Crea una nueva clase con los datos proporcionados",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Clase creada exitosamente"),
-                    @ApiResponse(responseCode = "400", description = "Error en la solicitud")
+            @Operation(
+                    summary = "Crear una nueva clase",
+                    description = "Crea una nueva clase con los datos proporcionados",
+                    responses = {
+                            @ApiResponse(responseCode = "201", description = "Clase creada exitosamente"),
+                            @ApiResponse(responseCode = "400", description = "Error en la solicitud")
+                    }
+            )
+            public ResponseEntity<Class> createClass(@Valid @RequestBody Class newClass) {
+                Class createdClass = classService.createClass(newClass);
+                return ResponseEntity.status(201).body(createdClass);
             }
-    )
-    public ResponseEntity<List<Class>> createClass(@Valid @RequestBody Class newClass) {
-        List<Class> createdClasses = classService.createClass(newClass);
-        return ResponseEntity.status(201).body(createdClasses);
-    }
 
 
     @PutMapping("/update")

@@ -24,16 +24,19 @@ public class InscriptionController {
 
     @GetMapping
     @Operation(
-            summary = "inscripciones realizadas",
-            description = "Obtiene todas las inscripciones realizadas"
+            summary = "Get pending class assistances",
+            description = "Retrieves all assistances that are not confirmed and belong to classes with upcoming sessions"
     )
-    public ResponseEntity<List<Assistance>> getAllReserves() {
-        List<Assistance> asistances = inscriptionService.getAssistancesWithFalseAfter();
-        if (asistances.isEmpty()) {
+    public ResponseEntity<List<Assistance>> getPendingAssistances() {
+        List<Assistance> assistances = inscriptionService.getAssistancesWithFalseAfter();
+
+        if (assistances.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(asistances);
+
+        return ResponseEntity.ok(assistances);
     }
+
 
     @PostMapping("/inscribe")
     @Operation(
