@@ -227,10 +227,25 @@ This microservice manages the registration, consultation, and monitoring of atte
 ### 📚 Class Diagram
 
 ![Class Diagram](assets/2.png)
+This class diagram represents an extracurricular class attendance management module, designed to record, view, and manage user (student, teacher, etc.) participation in activities such as sports, cultural workshops, and so on.
+
+
+Brief description of the classes:
+- Class: Models an extracurricular class with: id (unique identifier), name (activity name), MaxStudents (maximum student capacity), StartTime/EndTime (start and end dates and times), and resources: List of required resources (supplies, equipment, etc.).
+- Attendance: Records a user's attendance in a class with: userId (ID of the user who attended), classId (ID of the class attended), and confirm (attendance confirmation status).
+- User: Represents a system user with: id (unique identifier), name (full name), type (user role: Student, Teacher, Administrative), identification (identification document), and email (email address).
 
 ### 🔁 Sequence Diagram
 
 ![Sequence Diagram](assets/6.png) 
+- Process Start (User): The user initiates the action by requesting attendance confirmation using the confirmAssistance(userId, classId) operation from the web client interface.
+- Web Client → Controller: The web client sends the request to the Assistance Controller, passing the userId and classId as parameters.
+- Controller → Service: The Assistance Controller forwards the request to the Assistance Service, which handles the business logic related to the confirmation.
+- Service → Repository: The Assistance Service queries the Assistance Repository using the findByUserIdAndClassId(userId, classId) method to verify if an attendance record exists for the user in the corresponding class.
+- Repository → Service: The repository returns the found information to the Assistance Service.
+- Service → Assistance Entity: If the record is found, the service marks the attendance as confirmed by calling the setConfirm(true) method on the Assistance entity.
+
+Return result: If the confirmation is successful, the system returns the representative data to the web client. Otherwise, the controller returns an error message (ConfirmAssistanceFail) to the client.
 
 ### 📘 Swagger Documentation
 
