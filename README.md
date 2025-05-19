@@ -85,29 +85,45 @@ This microservice manages the registration, consultation, and monitoring of atte
 
 ```json
 {
-  "_id": ObjectId("644a8e64e77b5f001e5d15df"),
-  "nombre": "Yoga al aire libre",
-  "tipoActividad": "RELACION",
-  "capacidadMaxima": 20,
-  "fechaInicio": ISODate("2025-04-25T18:00:00Z"),
-  "fechaFin": ISODate("2025-06-25T19:00:00Z"),
-  "recursos": [
-    {
-      "nombre": "Colchonetas",
-      "tipo": "implemento",
-      "disponibilidad": {
-        "2025-04-25": true,
-        "2025-04-27": false
+  {
+    "id": "course-001",
+    "name": "Painting for Beginners",
+    "maxStudents": 20,
+    "type": "Art",
+    "startDate": "2025-06-01",
+    "endDate": "2025-07-15",
+    "sessions": [
+      {
+        "id": "session-001",
+        "day": "Monday",
+        "startTime": "10:00",
+        "endTime": "12:00"
+      },
+      {
+        "id": "session-002",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "12:00"
       }
-    },
-    {
-      "nombre": "Salón 2",
-      "tipo": "salon",
-      "disponibilidad": {
-        "2025-04-25": true
+    ],
+    "resources": [
+      {
+        "name": "Canvas",
+        "quantity": 20
+      },
+      {
+        "name": "Paint Brushes",
+        "quantity": 20
+      },
+      {
+        "name": "Acrylic Paint Set",
+        "quantity": 20
       }
-    }
-  ]
+    ],
+    "instructorId": "instructor-123",
+    "repetition": "WEEKLY",
+    "endTimeRepetition": "2025-07-15"
+  }
 }
 ```
 
