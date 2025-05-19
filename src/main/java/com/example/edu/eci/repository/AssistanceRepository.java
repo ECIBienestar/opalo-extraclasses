@@ -2,6 +2,7 @@ package com.example.edu.eci.repository;
 
 import com.example.edu.eci.model.Assistance;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +16,12 @@ public interface AssistanceRepository extends MongoRepository<Assistance, String
     List<Assistance> findByConfirmFalseAndStartTimeIsAfter(LocalDateTime now);
     List<Assistance> findByConfirmTrue();
     void deleteByUserIdAndClassId(String userId, String classId);
-    int countByUserIdAndConfirmTrueAndStartTimeBetween(String userId, LocalDate start, LocalDate end);
+    int countByUserIdAndConfirmTrueAndStartTimeBetween(String userId, LocalDateTime startTime, LocalDateTime startTime2);
     int countByUserIdAndClassIdAndConfirmTrue(String userId, String classId);
     List<Assistance> findByConfirmFalseAndStartTimeIsBefore(LocalDateTime now);
+    List<Assistance> findByConfirmFalseAndClassIdIn(List<String> classIds);
+    Optional<Assistance> findByUserIdAndClassIdAndSessionId(String userId, String classId, String sessionId);
+    @Query("SELECT COUNT(DISTINCT a.userId) FROM Assistance a WHERE a.classId = classId")
+    long countDistinctUsersByClassId(String classId);
+
 }

@@ -26,18 +26,15 @@ public class ClassService {
         return classRepository.findById(id);
     }
 
-    public List<Class> createClass(Class newClass) {
-        List<Class> createdClasses = new ArrayList<>();
-
+    public Class createClass(Class newClass) {
         Class savedClass = classRepository.save(newClass);
-        createdClasses.add(savedClass);
-
-        if (newClass.getRepetition() != null && newClass.getEndTimeRepetition() != null) {
-            List<Class> repeatedClasses = generateRepeatedClasses(savedClass);
-            classRepository.saveAll(repeatedClasses);
-            createdClasses.addAll(repeatedClasses);
+        if (newClass.getSessions() != null && !newClass.getSessions().isEmpty()) {
+            List<Class.Session> repeatedSessions = generateRepeatedSessions(newClass);
+            savedClass.getSessions().addAll(repeatedSessions);
+            classRepository.save(savedClass);
         }
-        return createdClasses;
+
+        return savedClass;
     }
 
     public Optional<Class> updateClass(String id, Class updatedClass) {
@@ -48,6 +45,10 @@ public class ClassService {
         return Optional.empty();
     }
 
+    public List<Class> getClassesByType(String type) {
+        return classRepository.findClassByType(type);
+    }
+
     public boolean deleteClass(String id) {
         if (classRepository.existsById(id)) {
             classRepository.deleteById(id);
@@ -56,45 +57,49 @@ public class ClassService {
         return false;
     }
 
-    public List<Class> getClassesByDateRange(LocalDateTime start, LocalDateTime end) {
-        return classRepository.findByStartTimeBetween(start, end);
+    public List<Class> getClassesByDateRange(String day, String startTime, String endTime) {
+        return classRepository.findByStartTimeBetween(day, startTime, endTime);
     }
 
-    public List<Class> getClassesByType(String type) {
-        return classRepository.findClassByType(type);
-    }
+    public List<Class.Session> generateRepeatedSessions(Class baseClass) {
+        List<Class.Session> repeatedSessions = new ArrayList<>();
 
-    public List<Class> generateRepeatedClasses(Class baseClass) {
-        List<Class> repeatedClasses = new ArrayList<>();
-
-        LocalDateTime currentStart = baseClass.getStartTime();
-        LocalDateTime currentEnd = baseClass.getEndTime();
-        LocalDateTime repetitionEnd = baseClass.getEndTimeRepetition();
-
-        ChronoUnit unit = switch (baseClass.getRepetition().toLowerCase()) {
-            case "weekly" -> ChronoUnit.WEEKS;
-            case "monthly" -> ChronoUnit.MONTHS;
-            default -> throw new IllegalArgumentException("Tipo de repetición no soportado: " + baseClass.getRepetition());
-        };
-
-        while (true) {
-            currentStart = currentStart.plus(1, unit);
-            currentEnd = currentEnd.plus(1, unit);
-            if (currentStart.isAfter(repetitionEnd)) break;
-
-            Class repeated = new Class();
-            repeated.setType(baseClass.getType());
-            repeated.setStartTime(currentStart);
-            repeated.setEndTime(currentEnd);
-            repeated.setInstructorId(baseClass.getInstructorId());
-            repeated.setMaxStudents(baseClass.getMaxStudents());
-            repeated.setRepetition(null);
-            repeated.setEndTimeRepetition(null);
-
-            repeatedClasses.add(repeated);
+        if (baseClass == null || baseClass.getSessions() == null || baseClass.getSessions().isEmpty()) {
+            return repeatedSessions;
+        }
+        LocalDate repetitionEndDate = baseClass.getEndDate();
+        if (repetitionEndDate == null) {
+            return repeatedSessions;
         }
 
-        return repeatedClasses;
+        Class.Session initialSessionTemplate = baseClass.getSessions().get(0);
+
+        LocalDateTime currentScheduledStartTime = LocalDateTime.parse(initialSessionTemplate.getStartTime());
+        LocalDateTime currentScheduledEndTime = LocalDateTime.parse(initialSessionTemplate.getEndTime());
+
+        ChronoUnit repetitionUnit = ChronoUnit.WEEKS;
+
+        while (true) {
+            LocalDateTime nextStartTime = currentScheduledStartTime.plus(1, repetitionUnit);
+            LocalDateTime nextEndTime = currentScheduledEndTime.plus(1, repetitionUnit);
+
+            if (nextStartTime.toLocalDate().isAfter(repetitionEndDate)) {
+                break;
+            }
+
+            Class.Session repeatedSession = new Class.Session(
+                    initialSessionTemplate.getId(),
+                    initialSessionTemplate.getDay(),
+                    nextStartTime.toString(),
+                    nextEndTime.toString()
+            );
+            repeatedSessions.add(repeatedSession);
+
+            currentScheduledStartTime = nextStartTime;
+            currentScheduledEndTime = nextEndTime;
+        }
+
+        return repeatedSessions;
     }
 
 }

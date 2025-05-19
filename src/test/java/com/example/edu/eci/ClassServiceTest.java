@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +38,10 @@ class ClassServiceTest {
         testClass1 = new Class();
         testClass1.setId(testId);
         testClass1.setName("Math 101");
-        testClass1.setStartTime(LocalDateTime.now());
 
         testClass2 = new Class();
         testClass2.setId("67890");
         testClass2.setName("History 201");
-        testClass2.setStartTime(LocalDateTime.now().plusDays(1));
     }
 
     @Test
@@ -74,16 +73,7 @@ class ClassServiceTest {
         assertFalse(result.isPresent());
     }
 
-    @Test
-    void createClass_shouldReturnListWithSingleClass_whenNoRepetition() {
-        when(classRepository.save(testClass1)).thenReturn(testClass1);
 
-        List<Class> result = classService.createClass(testClass1);
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(testClass1, result.get(0));
-        verify(classRepository, times(1)).save(testClass1);
-    }
 
 
     @Test
@@ -125,79 +115,184 @@ class ClassServiceTest {
         assertFalse(result);
     }
 
-    @Test
-    void getClassesByDateRange() {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = LocalDateTime.now().plusDays(7);
-        when(classRepository.findByStartTimeBetween(start, end)).thenReturn(Arrays.asList(testClass1));
 
-        List<Class> result = classService.getClassesByDateRange(start, end);
+
+    @Test
+    void createClass_shouldNotAddRepeatedSessions_whenNoSessionsAreProvided() {
+        Class newClass = new Class();
+        newClass.setId("123");
+
+        when(classRepository.save(newClass)).thenReturn(newClass);
+
+        Class result = classService.createClass(newClass);
+
+        assertNotNull(result);
+        assertNull(result.getSessions());
+        verify(classRepository, times(1)).save(newClass);
+    }
+
+
+    @Test
+    void deleteClass_shouldNotDelete_whenClassDoesNotExist() {
+        String invalidId = "invalid";
+
+        when(classRepository.existsById(invalidId)).thenReturn(false);
+
+        boolean result = classService.deleteClass(invalidId);
+
+        assertFalse(result);
+        verify(classRepository, never()).deleteById(invalidId);
+    }
+    @Test
+    void generateRepeatedSessions_shouldGenerateSessionsUntilEndDate() {
+        Class baseClass = new Class();
+        baseClass.setEndDate(LocalDate.of(2024, 1, 22));
+        baseClass.setSessions(List.of(new Class.Session("1","Monday", "2024-01-01T10:00", "2024-01-01T11:00")));
+
+        List<Class.Session> result = classService.generateRepeatedSessions(baseClass);
+
+        assertEquals(3, result.size());
+        assertEquals("2024-01-08T10:00", result.get(0).getStartTime());
+        assertEquals("2024-01-15T10:00", result.get(1).getStartTime());
+        assertEquals("2024-01-22T10:00", result.get(2).getStartTime());
+    }
+
+    @Test
+    void generateRepeatedSessions_shouldReturnEmptyList_whenNoSessionsProvided() {
+        Class baseClass = new Class();
+        baseClass.setEndDate(LocalDate.of(2024, 1, 22));
+        baseClass.setSessions(List.of());
+
+        List<Class.Session> result = classService.generateRepeatedSessions(baseClass);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void generateRepeatedSessions_shouldReturnEmptyList_whenEndDateBeforeStartDate() {
+        Class baseClass = new Class();
+        baseClass.setEndDate(LocalDate.of(2023, 12, 31));
+        baseClass.setSessions(List.of(new Class.Session("1","Monday", "2024-01-01T10:00", "2024-01-01T11:00")));
+
+        List<Class.Session> result = classService.generateRepeatedSessions(baseClass);
+
+        assertTrue(result.isEmpty());
+    }
+    @Test
+    void getClassesByType_shouldReturnClassesOfSpecifiedType() {
+        when(classRepository.findClassByType("Math")).thenReturn(List.of(testClass1));
+
+        List<Class> result = classService.getClassesByType("Math");
 
         assertEquals(1, result.size());
-        verify(classRepository, times(1)).findByStartTimeBetween(start, end);
+        assertEquals("Math 101", result.get(0).getName());
+        verify(classRepository, times(1)).findClassByType("Math");
     }
 
     @Test
-    void generateRepeatedClasses_weekly_repetition_should_create_correct_number() {
+    void getClassesByType_shouldReturnEmptyList_whenNoClassesOfSpecifiedTypeExist() {
+        when(classRepository.findClassByType("Science")).thenReturn(List.of());
+
+        List<Class> result = classService.getClassesByType("Science");
+
+        assertTrue(result.isEmpty());
+        verify(classRepository, times(1)).findClassByType("Science");
+    }
+
+    @Test
+    void getClassesByType_shouldHandleNullTypeGracefully() {
+        when(classRepository.findClassByType(null)).thenReturn(List.of());
+
+        List<Class> result = classService.getClassesByType(null);
+
+        assertTrue(result.isEmpty());
+        verify(classRepository, times(1)).findClassByType(null);
+    }
+    @Test
+    void createClass_shouldSaveClassWithRepeatedSessions_whenSessionsAreProvided() {
+        Class newClass = new Class();
+        newClass.setId("123");
+        newClass.setSessions(List.of(new Class.Session("1","Monday", "2024-01-01T10:00", "2024-01-01T11:00")));
+        newClass.setEndDate(LocalDate.of(2024, 1, 22));
+
+        Class savedClass = new Class();
+        savedClass.setId("123");
+        savedClass.setSessions(new ArrayList<>(newClass.getSessions()));
+
+        when(classRepository.save(newClass)).thenReturn(savedClass);
+        when(classRepository.save(savedClass)).thenReturn(savedClass);
+
+        Class result = classService.createClass(newClass);
+
+        assertNotNull(result);
+        assertEquals(4, result.getSessions().size()); // Original + 3 repeated sessions
+        verify(classRepository, times(2)).save(any(Class.class));
+    }
+
+    @Test
+    void createClass_shouldSaveClassWithoutSessions_whenNoSessionsAreProvided() {
+        Class newClass = new Class();
+        newClass.setId("123");
+
+        when(classRepository.save(newClass)).thenReturn(newClass);
+
+        Class result = classService.createClass(newClass);
+
+        assertNotNull(result);
+        assertNull(result.getSessions());
+        verify(classRepository, times(1)).save(newClass);
+    }
+
+    @Test
+    void createClass_shouldHandleNullSessionsGracefully() {
+        Class newClass = new Class();
+        newClass.setId("123");
+        newClass.setSessions(null);
+
+        when(classRepository.save(newClass)).thenReturn(newClass);
+
+        Class result = classService.createClass(newClass);
+
+        assertNotNull(result);
+        assertNull(result.getSessions());
+        verify(classRepository, times(1)).save(newClass);
+    }
+    @Test
+    void generateRepeatedSessions_shouldReturnEmptyList_whenBaseClassIsNull() {
+        List<Class.Session> result = classService.generateRepeatedSessions(null);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void generateRepeatedSessions_shouldReturnEmptyList_whenSessionsAreNull() {
         Class baseClass = new Class();
-        baseClass.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
-        baseClass.setEndTime(LocalDateTime.of(2024, 1, 1, 11, 0));
-        baseClass.setRepetition("weekly");
-        baseClass.setEndTimeRepetition(LocalDateTime.of(2024, 1, 22, 10, 0));
-        baseClass.setInstructorId("instructor123");
+        baseClass.setSessions(null);
 
-        List<Class> repeated = classService.generateRepeatedClasses(baseClass);
+        List<Class.Session> result = classService.generateRepeatedSessions(baseClass);
 
-        assertEquals(3, repeated.size()); // 3 repeticiones: 8, 15, 22 de enero
-        assertEquals(LocalDateTime.of(2024, 1, 8, 10, 0), repeated.get(0).getStartTime());
-        assertEquals("instructor123", repeated.get(0).getInstructorId());
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void generateRepeatedClasses_should_return_empty_when_repetition_end_is_before_next_occurrence() {
+    void generateRepeatedSessions_shouldReturnEmptyList_whenSessionsAreEmpty() {
         Class baseClass = new Class();
-        baseClass.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
-        baseClass.setEndTime(LocalDateTime.of(2024, 1, 1, 11, 0));
-        baseClass.setRepetition("weekly");
-        baseClass.setEndTimeRepetition(LocalDateTime.of(2024, 1, 2, 10, 0)); // no alcanza para repetir
+        baseClass.setSessions(List.of());
 
-        List<Class> repeated = classService.generateRepeatedClasses(baseClass);
+        List<Class.Session> result = classService.generateRepeatedSessions(baseClass);
 
-        assertTrue(repeated.isEmpty(), "No se deberían generar clases repetidas");
-    }
-
-
-    @Test
-    void testGetClassesByType_returnsMatchingClasses() {
-        String type = "Deportiva";
-        Class class1 = new Class();
-        class1.setId("1");
-        class1.setType(type);
-
-        Class class2 = new Class();
-        class2.setId("2");
-        class2.setType(type);
-
-        when(classRepository.findClassByType(type)).thenReturn(List.of(class1, class2));
-
-        List<Class> result = classService.getClassesByType(type);
-
-        assertEquals(2, result.size());
-        assertEquals(type, result.get(0).getType());
-        verify(classRepository).findClassByType(type);
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void generateRepeatedClasses_invalid_repetition_type_should_throw_exception() {
+    void generateRepeatedSessions_shouldReturnEmptyList_whenEndDateIsNull() {
         Class baseClass = new Class();
-        baseClass.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
-        baseClass.setEndTime(LocalDateTime.of(2024, 1, 1, 11, 0));
-        baseClass.setRepetition("daily");
-        baseClass.setEndTimeRepetition(LocalDateTime.of(2024, 1, 10, 10, 0));
+        baseClass.setSessions(List.of(new Class.Session("1","Monday", "2024-01-01T10:00", "2024-01-01T11:00")));
+        baseClass.setEndDate(null);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            classService.generateRepeatedClasses(baseClass);
-        });
+        List<Class.Session> result = classService.generateRepeatedSessions(baseClass);
+
+        assertTrue(result.isEmpty());
     }
 
 
