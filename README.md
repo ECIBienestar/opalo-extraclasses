@@ -130,45 +130,17 @@ This microservice manages the registration, consultation, and monitoring of atte
 ### `asistencias`
 
 ```json
-{
-  "_id": ObjectId("644a8ec8e77b5f001e5d15e0"),
-  "usuarioId": "644a8e20e77b5f001e5d15de",
-  "claseId": "644a8e64e77b5f001e5d15df",
-  "fechaHora": ISODate("2025-04-25T18:00:00Z"),
-  "confirmada": true
-}
-```
-
-### `notificaciones`
-
-```json
-{
-  "_id": ObjectId("644a8efee77b5f001e5d15e1"),
-  "usuarioId": "644a8e20e77b5f001e5d15de",
-  "tipo": "RECORDATORIO",
-  "mensaje": "No olvides tu clase de Yoga a las 18:00",
-  "fechaEnvio": ISODate("2025-04-25T12:00:00Z"),
-  "enviado": true
-}
-```
-
-### `reportes`
-
-```json
-{
-  "_id": ObjectId("644a8f3ae77b5f001e5d15e2"),
-  "tipo": "POR_USUARIO",
-  "parametros": {
-    "usuarioId": "644a8e20e77b5f001e5d15de",
-    "rangoFechas": {
-      "inicio": ISODate("2025-04-01T00:00:00Z"),
-      "fin": ISODate("2025-04-30T23:59:59Z")
-    }
-  },
-  "contenido": "https://api.universidad.edu/reportes/usuario/644a8e20e77b5f001e5d15de/abril2025.pdf",
-  "fechaGeneracion": ISODate("2025-04-25T20:00:00Z")
-}
-```
+[
+  {
+    "id": "attendance-001",
+    "startTime": "2025-06-03T10:00:00.000Z",
+    "userId": "user-456",
+    "instructorId": "instructor-123",
+    "classId": "course-001",
+    "confirm": true,
+    "sessionId": "session-001"
+  }
+]
 
 ---
 
