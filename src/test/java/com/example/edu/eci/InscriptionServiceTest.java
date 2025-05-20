@@ -133,4 +133,52 @@ class InscriptionServiceTest {
         assertFalse(result.get(0).isConfirm());
         assertFalse(result.get(1).isConfirm());
     }
+
+    @Test
+    void shouldReturnPendingAssistancesByUser() {
+        String userId = "user1";
+        LocalDate today = LocalDate.now();
+
+        Class activeClass = new Class();
+        activeClass.setId("class1");
+        activeClass.setEndDate(today.plusDays(1));
+
+        Assistance a1 = new Assistance();
+        a1.setUserId(userId);
+        a1.setClassId("class1");
+        a1.setConfirm(false);
+
+        when(classRepository.findByEndDateAfterOrEndDateEquals(today, today))
+                .thenReturn(List.of(activeClass));
+
+        when(assistanceRepository.findByUserIdAndConfirmFalseAndClassIdIn(userId, List.of("class1")))
+                .thenReturn(List.of(a1));
+
+        List<Assistance> result = inscriptionService.getPendingAssistancesByUser(userId);
+
+        assertEquals(1, result.size());
+        assertEquals("user1", result.get(0).getUserId());
+        assertEquals("class1", result.get(0).getClassId());
+        assertFalse(result.get(0).isConfirm());
+    }
+
+
+    @Test
+    void shouldReturnEmptyListIfNoActiveClasses() {
+        String userId = "user1";
+        LocalDate today = LocalDate.now();
+
+        when(classRepository.findByEndDateAfterOrEndDateEquals(today, today))
+                .thenReturn(List.of());
+
+        when(assistanceRepository.findByUserIdAndConfirmFalseAndClassIdIn(userId, List.of()))
+                .thenReturn(List.of());
+
+        List<Assistance> result = inscriptionService.getPendingAssistancesByUser(userId);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+
 }

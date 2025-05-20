@@ -37,6 +37,29 @@ public class InscriptionController {
         return ResponseEntity.ok(assistances);
     }
 
+    @GetMapping("/my-inscriptions")
+    @Operation(
+            summary = "Obtener inscripciones pendientes por usuario",
+            description = "Devuelve todas las asistencias no confirmadas de un usuario en clases activas (con fecha de finalización hoy o posterior)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Inscripciones encontradas"),
+                    @ApiResponse(responseCode = "204", description = "No hay inscripciones pendientes")
+            }
+    )
+    public ResponseEntity<List<Assistance>> getPendingAssistancesByUser(
+            @Parameter(description = "ID del usuario", required = true, example = "123")
+            @RequestParam String userId) {
+
+        List<Assistance> assistances = inscriptionService.getPendingAssistancesByUser(userId);
+
+        if (assistances.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(assistances);
+    }
+
+
 
     @PostMapping("/inscribe")
     @Operation(
