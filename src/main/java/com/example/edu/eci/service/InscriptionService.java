@@ -77,18 +77,6 @@ public class InscriptionService {
         return assistanceRepository.findByConfirmFalseAndClassIdIn(activeClassIds);
     }
 
-    public List<Assistance> getPendingAssistancesByUser(String userId) {
-        LocalDate today = LocalDate.now();
-
-        List<String> activeClassIds = classRepository.findByEndDateAfterOrEndDateEquals(today, today)
-                .stream()
-                .map(Class::getId)
-                .collect(Collectors.toList());
-
-        return assistanceRepository.findByUserIdAndConfirmFalseAndClassIdIn(userId, activeClassIds);
-    }
-
-
 
     public void deleteInscription(String userId, String classId) {
         if (!assistanceRepository.existsByUserIdAndClassId(userId, classId)) {
