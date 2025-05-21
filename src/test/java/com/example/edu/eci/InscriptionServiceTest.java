@@ -102,81 +102,98 @@ class InscriptionServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoFutureUnconfirmedAssistances() {
-        when(classRepository.findByEndDateAfterOrEndDateEquals(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(List.of());
-        when(assistanceRepository.findByConfirmFalseAndClassIdIn(List.of()))
+        // Arrange
+        LocalDateTime now = LocalDateTime.now();
+        when(assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(now))
                 .thenReturn(List.of());
 
-        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
+        // Act
+        List<Assistance> result = inscriptionService.findFutureUnconfirmedAssistances();
+
+        // Assert
         assertTrue(result.isEmpty());
+        verify(assistanceRepository).findByStartTimeAfterAndConfirmIsFalse(now);
     }
 
     @Test
     void shouldReturnFutureUnconfirmedAssistances() {
+        // Arrange
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime futureDate = now.plusDays(1);
+
         Assistance a1 = new Assistance();
-        a1.setUserId("u1"); a1.setClassId("c1"); a1.setConfirm(false);
+        a1.setId("a1");
+        a1.setStartTime(futureDate);
+        a1.setConfirm(false);
+
         Assistance a2 = new Assistance();
-        a2.setUserId("u2"); a2.setClassId("c2"); a2.setConfirm(false);
+        a2.setId("a2");
+        a2.setStartTime(futureDate.plusHours(2));
+        a2.setConfirm(false);
 
-        Class activeClass1 = new Class(); activeClass1.setId("c1");
-        Class activeClass2 = new Class(); activeClass2.setId("c2");
-
-        when(classRepository.findByEndDateAfterOrEndDateEquals(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(List.of(activeClass1, activeClass2));
-
-        when(assistanceRepository.findByConfirmFalseAndClassIdIn(List.of("c1", "c2")))
+        when(assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(now))
                 .thenReturn(List.of(a1, a2));
 
-        List<Assistance> result = inscriptionService.getAssistancesWithFalseAfter();
+        // Act
+        List<Assistance> result = inscriptionService.findFutureUnconfirmedAssistances();
 
+        // Assert
         assertEquals(2, result.size());
         assertFalse(result.get(0).isConfirm());
         assertFalse(result.get(1).isConfirm());
+        assertTrue(result.get(0).getStartTime().isAfter(now));
+        assertTrue(result.get(1).getStartTime().isAfter(now));
+        verify(assistanceRepository).findByStartTimeAfterAndConfirmIsFalse(now);
+    }
+    @Test
+    void shouldReturnEmptyListIfNoFutureAssistances() {
+        String userId = "user1";
+        LocalDateTime now = LocalDateTime.now();
+
+        when(assistanceRepository.findByUserIdAndStartTimeAfterAndConfirmIsFalse(userId, now))
+                .thenReturn(List.of());
+
+        List<Assistance> result = inscriptionService.findFutureUnconfirmedAssistancesByUser(userId);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void shouldReturnPendingAssistancesByUser() {
+    void shouldNotReturnConfirmedAssistances() {
         String userId = "user1";
-        LocalDate today = LocalDate.now();
-
-        Class activeClass = new Class();
-        activeClass.setId("class1");
-        activeClass.setEndDate(today.plusDays(1));
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime futureDate = now.plusDays(1);
 
         Assistance a1 = new Assistance();
         a1.setUserId(userId);
-        a1.setClassId("class1");
-        a1.setConfirm(false);
+        a1.setStartTime(futureDate);
+        a1.setConfirm(true); // Asistencia confirmada
 
-        when(classRepository.findByEndDateAfterOrEndDateEquals(today, today))
-                .thenReturn(List.of(activeClass));
+        when(assistanceRepository.findByUserIdAndStartTimeAfterAndConfirmIsFalse(userId, now))
+                .thenReturn(List.of());
 
-        when(assistanceRepository.findByUserIdAndConfirmFalseAndClassIdIn(userId, List.of("class1")))
-                .thenReturn(List.of(a1));
+        List<Assistance> result = inscriptionService.findFutureUnconfirmedAssistancesByUser(userId);
 
-        List<Assistance> result = inscriptionService.getPendingAssistancesByUser(userId);
-
-        assertEquals(1, result.size());
-        assertEquals("user1", result.get(0).getUserId());
-        assertEquals("class1", result.get(0).getClassId());
-        assertFalse(result.get(0).isConfirm());
+        assertTrue(result.isEmpty());
     }
 
-
     @Test
-    void shouldReturnEmptyListIfNoActiveClasses() {
+    void shouldNotReturnPastAssistances() {
         String userId = "user1";
-        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime pastDate = now.minusDays(1);
 
-        when(classRepository.findByEndDateAfterOrEndDateEquals(today, today))
+        Assistance a1 = new Assistance();
+        a1.setUserId(userId);
+        a1.setStartTime(pastDate); // Fecha pasada
+        a1.setConfirm(false);
+
+        when(assistanceRepository.findByUserIdAndStartTimeAfterAndConfirmIsFalse(userId, now))
                 .thenReturn(List.of());
 
-        when(assistanceRepository.findByUserIdAndConfirmFalseAndClassIdIn(userId, List.of()))
-                .thenReturn(List.of());
+        List<Assistance> result = inscriptionService.findFutureUnconfirmedAssistancesByUser(userId);
 
-        List<Assistance> result = inscriptionService.getPendingAssistancesByUser(userId);
-
-        assertNotNull(result);
         assertTrue(result.isEmpty());
     }
 

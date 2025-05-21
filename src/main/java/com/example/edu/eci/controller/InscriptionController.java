@@ -28,19 +28,19 @@ public class InscriptionController {
             description = "Retrieves all assistances that are not confirmed and belong to classes with upcoming sessions"
     )
     public ResponseEntity<List<Assistance>> getPendingAssistances() {
-        List<Assistance> assistances = inscriptionService.getAssistancesWithFalseAfter();
+        List<Assistance> pendingAssistances = inscriptionService.findFutureUnconfirmedAssistances();
 
-        if (assistances.isEmpty()) {
+        if (pendingAssistances.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(assistances);
+        return ResponseEntity.ok(pendingAssistances);
     }
 
     @GetMapping("/my-inscriptions")
     @Operation(
             summary = "Obtener inscripciones pendientes por usuario",
-            description = "Devuelve todas las asistencias no confirmadas de un usuario en clases activas (con fecha de finalización hoy o posterior)",
+            description = "Devuelve todas las asistencias no confirmadas de un usuario con fecha futura",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Inscripciones encontradas"),
                     @ApiResponse(responseCode = "204", description = "No hay inscripciones pendientes")
@@ -50,13 +50,11 @@ public class InscriptionController {
             @Parameter(description = "ID del usuario", required = true, example = "123")
             @RequestParam String userId) {
 
-        List<Assistance> assistances = inscriptionService.getPendingAssistancesByUser(userId);
+        List<Assistance> assistances = inscriptionService.findFutureUnconfirmedAssistancesByUser(userId);
 
-        if (assistances.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(assistances);
+        return assistances.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(assistances);
     }
 
 
