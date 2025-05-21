@@ -12,8 +12,6 @@ import java.util.Optional;
 public interface AssistanceRepository extends MongoRepository<Assistance, String> {
     boolean existsByUserIdAndClassId(String userId, String classId);
     long countByClassId(String claseId);
-    Optional<Assistance> findByUserIdAndClassId(String usuarioId, String claseId);
-    List<Assistance> findByConfirmFalseAndStartTimeIsAfter(LocalDateTime now);
     List<Assistance> findByConfirmTrue();
     void deleteByUserIdAndClassId(String userId, String classId);
     int countByUserIdAndConfirmTrueAndStartTimeBetween(String userId, LocalDateTime startTime, LocalDateTime startTime2);
@@ -26,4 +24,5 @@ public interface AssistanceRepository extends MongoRepository<Assistance, String
     long countDistinctUsersByClassId(String classId);
     List<Assistance> findByStartTimeAfterAndConfirmIsFalse(LocalDateTime dateTime);
     List<Assistance> findByUserIdAndStartTimeAfterAndConfirmIsFalse(String userId, LocalDateTime dateTime);
+    List<Assistance> findByUserIdAndConfirmIsTrue(String userId);
 }
