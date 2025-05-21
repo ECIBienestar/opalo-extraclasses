@@ -100,4 +100,7 @@ public class AssistanceService {
             assistanceRepository.save(assistance);
         }
     }
+    public List<Assistance> findAssistancesHistoricByUser(String userId) {
+        return assistanceRepository.findByUserIdAndConfirmIsTrue(userId);
+    }
 }

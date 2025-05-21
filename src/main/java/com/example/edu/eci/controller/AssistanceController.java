@@ -47,10 +47,10 @@ public class AssistanceController {
             @Parameter(description = "ID del usuario", required = true) @RequestParam String userId,
             @Parameter(description = "ID del instructor", required = true) @RequestParam String instructorId,
             @Parameter(description = "ID de la clase", required = true) @RequestParam String classId,
-            @Parameter(description = "ID de la sesión", required = true) @RequestParam String sessionId
+            @Parameter(description = "ID de la sesión", required = true) @RequestParam String SessionId
     ) {
         try {
-            assistanceService.confirmAssistance(userId, classId, sessionId, instructorId);
+            assistanceService.confirmAssistance(userId, classId, SessionId, instructorId);
             return ResponseEntity.ok("Asistencia confirmada exitosamente");
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -100,6 +100,25 @@ public class AssistanceController {
     public ResponseEntity<List<Assistance>> getAllAbsences() {
         List<Assistance> assistances = assistanceService.getAssistancesWithFalseBefore();
         return assistances.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assistances);
+    }
+    @GetMapping("/my-Historical")
+    @Operation(
+            summary = "Obtener historico de asistencias por usuario",
+            description = "Devuelve todas las asistencias confirmadas de un usuario",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "historial encontradas"),
+                    @ApiResponse(responseCode = "204", description = "No hay Historial")
+            }
+    )
+    public ResponseEntity<List<Assistance>> getPendingAssistancesByUser(
+            @Parameter(description = "ID del usuario", required = true, example = "123")
+            @RequestParam String userId) {
+
+        List<Assistance> assistances = assistanceService.findAssistancesHistoricByUser(userId);
+
+        return assistances.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(assistances);
     }
 }
 
