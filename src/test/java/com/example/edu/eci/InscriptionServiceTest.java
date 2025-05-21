@@ -104,7 +104,9 @@ class InscriptionServiceTest {
     void shouldReturnEmptyListWhenNoFutureUnconfirmedAssistances() {
         // Arrange
         LocalDateTime now = LocalDateTime.now();
-        when(assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(now))
+
+        // Usa any() para ignorar las diferencias mínimas de tiempo
+        when(assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(any(LocalDateTime.class)))
                 .thenReturn(List.of());
 
         // Act
@@ -112,7 +114,7 @@ class InscriptionServiceTest {
 
         // Assert
         assertTrue(result.isEmpty());
-        verify(assistanceRepository).findByStartTimeAfterAndConfirmIsFalse(now);
+        verify(assistanceRepository).findByStartTimeAfterAndConfirmIsFalse(any(LocalDateTime.class));
     }
 
     @Test
@@ -131,7 +133,8 @@ class InscriptionServiceTest {
         a2.setStartTime(futureDate.plusHours(2));
         a2.setConfirm(false);
 
-        when(assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(now))
+        // Usa any() para evitar problemas de precisión temporal
+        when(assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(any(LocalDateTime.class)))
                 .thenReturn(List.of(a1, a2));
 
         // Act
@@ -143,8 +146,9 @@ class InscriptionServiceTest {
         assertFalse(result.get(1).isConfirm());
         assertTrue(result.get(0).getStartTime().isAfter(now));
         assertTrue(result.get(1).getStartTime().isAfter(now));
-        verify(assistanceRepository).findByStartTimeAfterAndConfirmIsFalse(now);
+        verify(assistanceRepository).findByStartTimeAfterAndConfirmIsFalse(any(LocalDateTime.class));
     }
+
     @Test
     void shouldReturnEmptyListIfNoFutureAssistances() {
         String userId = "user1";
