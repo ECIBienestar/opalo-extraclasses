@@ -1,5 +1,6 @@
 package com.example.edu.eci.repository;
 import com.example.edu.eci.model.Class;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

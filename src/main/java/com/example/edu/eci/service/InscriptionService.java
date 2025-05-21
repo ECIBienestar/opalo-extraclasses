@@ -65,30 +65,15 @@ public class InscriptionService {
         });
     }
 
-
-    public List<Assistance> getAssistancesWithFalseAfter() {
-        LocalDate today = LocalDate.now();
-
-        List<String> activeClassIds = classRepository.findByEndDateAfterOrEndDateEquals(today,today)
-                .stream()
-                .map(Class::getId)
-                .collect(Collectors.toList());
-
-        return assistanceRepository.findByConfirmFalseAndClassIdIn(activeClassIds);
+    public List<Assistance> findFutureUnconfirmedAssistances() {
+        LocalDateTime now = LocalDateTime.now();
+        return assistanceRepository.findByStartTimeAfterAndConfirmIsFalse(now);
     }
 
-    public List<Assistance> getPendingAssistancesByUser(String userId) {
-        LocalDate today = LocalDate.now();
-
-        List<String> activeClassIds = classRepository.findByEndDateAfterOrEndDateEquals(today, today)
-                .stream()
-                .map(Class::getId)
-                .collect(Collectors.toList());
-
-        return assistanceRepository.findByUserIdAndConfirmFalseAndClassIdIn(userId, activeClassIds);
+    public List<Assistance> findFutureUnconfirmedAssistancesByUser(String userId) {
+        LocalDateTime now = LocalDateTime.now();
+        return assistanceRepository.findByUserIdAndStartTimeAfterAndConfirmIsFalse(userId, now);
     }
-
-
 
     public void deleteInscription(String userId, String classId) {
         if (!assistanceRepository.existsByUserIdAndClassId(userId, classId)) {

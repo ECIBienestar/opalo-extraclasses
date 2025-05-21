@@ -24,5 +24,6 @@ public interface AssistanceRepository extends MongoRepository<Assistance, String
     List<Assistance> findByUserIdAndConfirmFalseAndClassIdIn(String userId, List<String> classIds);
     @Query("SELECT COUNT(DISTINCT a.userId) FROM Assistance a WHERE a.classId = classId")
     long countDistinctUsersByClassId(String classId);
-
+    List<Assistance> findByStartTimeAfterAndConfirmIsFalse(LocalDateTime dateTime);
+    List<Assistance> findByUserIdAndStartTimeAfterAndConfirmIsFalse(String userId, LocalDateTime dateTime);
 }
