@@ -2,6 +2,7 @@ package com.example.edu.eci.config;
 
 import com.example.edu.eci.model.*;
 import com.example.edu.eci.model.Class;
+import com.example.edu.eci.model.enums.Role;
 import com.example.edu.eci.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,8 @@ this.userRepo = userRepo;
 @Override
 public void run(String... args) {
 if (userRepo.count() == 0) {
-userRepo.save(new User("123", "Juan","Student","12345678", "juan@gmail.com"));
-userRepo.save(new User("456", "Maria", "Student","12345678","maria@mail.com"));
+userRepo.save(new User("123", "Juan", Role.valueOf("Student"),"12345678", "juan@gmail.com"));
+userRepo.save(new User("456", "Maria", Role.valueOf("Student"),"12345678","maria@mail.com"));
 }
 }
 }
