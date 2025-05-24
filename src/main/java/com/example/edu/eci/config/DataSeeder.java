@@ -23,8 +23,7 @@ this.userRepo = userRepo;
 @Override
 public void run(String... args) {
 if (userRepo.count() == 0) {
-userRepo.save(new User("123", "Juan", Role.valueOf("Student"),"12345678", "juan@gmail.com"));
-userRepo.save(new User("456", "Maria", Role.valueOf("Student"),"12345678","maria@mail.com"));
+userRepo.save(new User("4795", "Emily", Role.valueOf("Student"),"9864573", "emily@gmail.com"));
 }
 }
 }
