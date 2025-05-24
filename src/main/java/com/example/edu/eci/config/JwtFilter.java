@@ -22,28 +22,35 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+        System.out.println("Header recibido: " + authHeader); // Debug 1
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+            System.out.println("Token extraído: " + token); // Debug 2
 
-            if (jwtService.validateToken(token)) {
-                String userId = jwtService.getUserIdFromToken(token);
+            try {
+                if (jwtService.validateToken(token)) {
+                    String userId = jwtService.getUserIdFromToken(token);
+                    System.out.println("Usuario autenticado: " + userId); // Debug 3
 
-                // Crea una autenticación para Spring Security
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        userId, null, Collections.emptyList()
-                );
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            } else {
+                    // Establece la autenticación en el contexto
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            userId, null, Collections.emptyList());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                } else {
+                    System.out.println("Token inválido"); // Debug 4
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+            } catch (Exception e) {
+                System.err.println("Error al validar el token: " + e.getMessage()); // Debug 5
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
+        } else {
+            System.out.println("No se encontró header 'Authorization' válido"); // Debug 6
         }
 
         filterChain.doFilter(request, response);
