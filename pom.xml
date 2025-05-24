@@ -135,6 +135,7 @@
 							<excludes>
 								<exclude>**/controller/*</exclude>
 								<exclude>**/model/*</exclude>
+								<exclude>**/enums/*</exclude>
 								<exclude>**/dto/*</exclude>
 								<exclude>**/config/*</exclude>
 								<exclude>Application.class</exclude>
@@ -169,6 +170,7 @@
 							<excludes>
 								<exclude>**/controller/*</exclude>
 								<exclude>**/model/*</exclude>
+								<exclude>**/enums/*</exclude>
 								<exclude>**/dto/*</exclude>
 								<exclude>com/example/edu/eci/config/*</exclude>
 								<exclude>**/config/*</exclude>
