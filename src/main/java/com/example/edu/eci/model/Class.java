@@ -38,6 +38,7 @@ public class Class {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Session {
         private String id;
         private String day;
