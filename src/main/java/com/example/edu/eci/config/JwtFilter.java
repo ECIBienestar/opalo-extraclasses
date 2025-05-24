@@ -4,10 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -27,17 +30,20 @@ public class JwtFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Quita "Bearer "
+            String token = authHeader.substring(7);
 
-            if (!jwtService.validateToken(token)) {
+            if (jwtService.validateToken(token)) {
+                String userId = jwtService.getUserIdFromToken(token);
+
+                // Crea una autenticación para Spring Security
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        userId, null, Collections.emptyList()
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-
-            String userId = jwtService.getUserIdFromToken(token);
-            System.out.println("Usuario autenticado: " + userId);
-
-            // Falta guardar USERID
         }
 
         filterChain.doFilter(request, response);
