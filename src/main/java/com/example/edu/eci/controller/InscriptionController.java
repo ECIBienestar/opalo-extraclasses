@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -73,10 +74,16 @@ public class InscriptionController {
             @RequestParam String userId,
 
             @Parameter(description = "ID de la clase", required = true, example = "abc123")
-            @RequestParam String classId) {
+            @RequestParam String classId,
+
+            @Parameter(description = "Fecha de inicio de la clase", required = true, example = "")
+            @RequestParam LocalDateTime startDate)
+
+
+    {
 
         try {
-            inscriptionService.inscribeUser(userId, classId);
+            inscriptionService.inscribeUser(userId, classId, startDate);
             return ResponseEntity.ok("Usuario inscrito exitosamente");
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
