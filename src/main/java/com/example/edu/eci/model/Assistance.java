@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class Assistance {
     @Id
     private String id;
-    private LocalDateTime startTime;
+    private LocalDate startTime;
     private String userId;
     private String instructorId;
     private String classId;

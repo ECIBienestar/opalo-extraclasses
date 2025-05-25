@@ -106,11 +106,11 @@ class AssistanceServiceTest {
     void getAssistancesWithFalseBeforeShouldReturnListOfUnconfirmedAssistancesBeforeNow() {
         Assistance assistance1 = new Assistance();
         assistance1.setConfirm(false);
-        assistance1.setStartTime(LocalDateTime.now().minusDays(1));
+        assistance1.setStartTime(LocalDate.now().minusDays(1));
 
         Assistance assistance2 = new Assistance();
         assistance2.setConfirm(false);
-        assistance2.setStartTime(LocalDateTime.now().minusHours(2));
+        assistance2.setStartTime(LocalDate.now().minusDays(2));
 
         when(assistanceRepository.findByConfirmFalseAndStartTimeIsBefore(any(LocalDateTime.class)))
                 .thenReturn(List.of(assistance1, assistance2));
