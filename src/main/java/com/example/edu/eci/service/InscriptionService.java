@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class InscriptionService {
     @Autowired
     private AssistanceRepository assistanceRepository;
 
-    public void inscribeUser(String userId, String classId) {
+    public void inscribeUser(String userId, String classId, LocalDateTime startDate) {
         Optional<User> userOpt = userRepository.findById(userId);
         Optional<Class> claseOpt = classRepository.findById(classId);
 
@@ -51,6 +52,7 @@ public class InscriptionService {
 
         Assistance classAssistance = new Assistance();
         classAssistance.setUserId(userId);
+        classAssistance.setStartTime(startDate);
         classAssistance.setClassId(classId);
         classAssistance.setConfirm(false);
         assistanceRepository.save(classAssistance);
