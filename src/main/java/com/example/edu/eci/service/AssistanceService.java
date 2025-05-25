@@ -95,7 +95,7 @@ public class AssistanceService {
             assistance.setUserId(userId);
             assistance.setClassId(classId);
             assistance.setSessionId(session.getId());
-            assistance.setStartTime(LocalDateTime.now());
+            assistance.setStartTime(LocalDate.now());
             assistance.setConfirm(false);
             assistanceRepository.save(assistance);
         }

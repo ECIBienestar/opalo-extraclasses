@@ -30,7 +30,7 @@ public class InscriptionService {
     @Autowired
     private AssistanceRepository assistanceRepository;
 
-    public void inscribeUser(String userId, String classId, LocalDateTime startDate) {
+    public void inscribeUser(String userId, String classId, LocalDate startDate) {
         Optional<User> userOpt = userRepository.findById(userId);
         Optional<Class> claseOpt = classRepository.findById(classId);
 

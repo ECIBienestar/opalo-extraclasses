@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class InscriptionController {
             @RequestParam String classId,
 
             @Parameter(description = "Fecha de inicio de la clase", required = true, example = "")
-            @RequestParam LocalDateTime startDate)
+            @RequestParam LocalDate startDate)
 
 
     {

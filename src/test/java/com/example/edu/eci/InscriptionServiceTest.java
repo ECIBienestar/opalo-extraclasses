@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ class InscriptionServiceTest {
     @Mock
     private AssistanceRepository assistanceRepository;
 
-    private final LocalDateTime testStartTime = LocalDateTime.now().plusDays(1);
+    private final LocalDate testStartTime = LocalDate.now().plusDays(1);
 
     @BeforeEach
     void setUp() {
@@ -136,7 +137,7 @@ class InscriptionServiceTest {
 
     @Test
     void shouldFailWhenStartTimeIsInThePast() {
-        LocalDateTime pastTime = LocalDateTime.now().minusDays(1);
+        LocalDate pastTime = LocalDate.now().minusDays(1);
         when(userRepository.findById("user1")).thenReturn(Optional.of(new User()));
         when(classRepository.findById("class1")).thenReturn(Optional.of(new Class()));
 
@@ -163,8 +164,8 @@ class InscriptionServiceTest {
     // Tests actualizados para manejar startTime
     @Test
     void shouldReturnFutureUnconfirmedAssistances() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime futureDate = now.plusDays(1);
+        LocalDate now = LocalDate.now();
+        LocalDate futureDate = now.plusDays(1);
 
         Assistance a1 = new Assistance();
         a1.setId("a1");
@@ -184,8 +185,8 @@ class InscriptionServiceTest {
     @Test
     void shouldReturnFutureUnconfirmedAssistancesByUser() {
         String userId = "user1";
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime futureDate = now.plusDays(1);
+        LocalDate now = LocalDate.now();
+        LocalDate futureDate = now.plusDays(1);
 
         Assistance a1 = new Assistance();
         a1.setUserId(userId);
